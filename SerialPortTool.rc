@@ -1,0 +1,323 @@
+// Microsoft Visual C++ generated resource script.
+//
+#include "resource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#ifndef APSTUDIO_INVOKED
+#include "targetver.h"
+#endif
+#include "afxres.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// 中文(简体，中国) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_CHS)
+LANGUAGE LANG_CHINESE, SUBLANG_CHINESE_SIMPLIFIED
+#pragma code_page(936)
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE 
+BEGIN
+    "#ifndef APSTUDIO_INVOKED\r\n"
+    "#include ""targetver.h""\r\n"
+    "#endif\r\n"
+    "#include ""afxres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE 
+BEGIN
+    "#define _AFX_NO_SPLITTER_RESOURCES\r\n"
+    "#define _AFX_NO_OLE_RESOURCES\r\n"
+    "#define _AFX_NO_TRACKER_RESOURCES\r\n"
+    "#define _AFX_NO_PROPERTY_RESOURCES\r\n"
+    "\r\n"
+    "#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_CHS)\r\n"
+    "LANGUAGE 4, 2\r\n"
+    "#pragma code_page(936)\r\n"
+    "#include ""res\\SerialPortTool.rc2""  // 非 Microsoft Visual C++ 编辑的资源\r\n"
+    "#include ""l.CHS\\afxres.rc""      // 标准组件\r\n"
+    "#endif\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDR_MAINFRAME           ICON                    "res\\SerialPortTool.ico"
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_SERIALPORTTOOL_DIALOG DIALOGEX 0, 0, 565, 356
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
+EXSTYLE WS_EX_APPWINDOW
+CAPTION "电流校准工具"
+FONT 10, "宋体", 400, 0, 0x86
+BEGIN
+    PUSHBUTTON      "打开串口",IDC_BTN_OPEN_CLOSE_PORT,100,0,41,14
+    COMBOBOX        IDC_CBO_BAUD_RATE,51,1,47,82,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    COMBOBOX        IDC_CBO_SERIAL_PORT,2,1,47,82,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    PUSHBUTTON      "接收清空",IDC_BTN_CLEAR_RECEIVE,292,316,53,14
+    CONTROL         "",IDC_LIST2,"SysListView32",LVS_REPORT | LVS_ALIGNLEFT | LVS_NOSCROLL | WS_BORDER | WS_TABSTOP,292,58,270,124
+    CONTROL         "",IDC_LIST3,"SysListView32",LVS_REPORT | LVS_ALIGNLEFT | LVS_NOSCROLL | WS_BORDER | WS_TABSTOP,292,16,270,37
+    PUSHBUTTON      "调试命令",IDC_SendOrder_BUTTON1,520,0,41,14
+    CONTROL         "",IDC_LIST4,"SysListView32",LVS_REPORT | LVS_EDITLABELS | LVS_ALIGNLEFT | LVS_NOSCROLL | WS_BORDER | WS_TABSTOP,292,190,258,120
+    PUSHBUTTON      "系数计算",IDC_BUTTON_Cal,455,316,53,14
+    PUSHBUTTON      "通道校准",IDC_BUTTON_SET,509,316,53,14
+    COMBOBOX        IDC_COMBO2,401,316,53,43,CBS_DROPDOWNLIST | WS_VSCROLL
+    CONTROL         "",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,553,211,8,8
+    CONTROL         "",IDC_CHECK2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,553,226,8,8
+    CONTROL         "",IDC_CHECK3,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,553,241,8,8
+    CONTROL         "",IDC_CHECK4,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,553,255,8,8
+    CONTROL         "",IDC_CHECK5,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,553,268,8,8
+    CONTROL         "",IDC_CHECK6,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,553,282,8,8
+    CONTROL         "",IDC_CHECK7,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,553,296,8,8
+    PUSHBUTTON      "0通道设置默认",IDC_BUTTON1,346,316,53,14
+    PUSHBUTTON      "设置时间",IDC_BUTTON3,141,0,41,14
+    PUSHBUTTON      "读取通道系数",IDC_BUTTON2,431,0,47,14
+    PUSHBUTTON      "写入参数",IDC_BUTTON_SAVE,478,0,41,14
+    PUSHBUTTON      "查看本机状态",showStateBtn,384,0,47,14
+    PUSHBUTTON      "设置IP地址",setIpBtn,182,0,41,14
+    EDITTEXT        EditIp2,249,1,16,13,ES_AUTOHSCROLL | ES_NUMBER
+    EDITTEXT        EditIP3,273,1,16,13,ES_AUTOHSCROLL | ES_NUMBER
+    LTEXT           "--",IDC_STATIC,241,3,8,8
+    EDITTEXT        EditIP1,225,1,16,13,ES_AUTOHSCROLL | ES_NUMBER
+    LTEXT           "--",IDC_STATIC,265,3,8,8
+    EDITTEXT        EditIP4,297,1,16,13,ES_AUTOHSCROLL | ES_NUMBER
+    LTEXT           "--",IDC_STATIC,289,3,8,8
+    PUSHBUTTON      "设置端口号",setPortBtn,314,0,41,14
+    EDITTEXT        IDC_EDITPort,357,1,25,13,ES_AUTOHSCROLL | ES_NUMBER
+    CONTROL         "",IDC_STATIC_ChildArea,"Static",SS_BLACKFRAME,291,183,273,154
+    PUSHBUTTON      "B类通讯协议",OpenChildFrame,509,339,53,14
+    EDITTEXT        IDC_EDIT1,346,342,10,12,ES_AUTOHSCROLL | ES_NUMBER | NOT WS_VISIBLE | NOT WS_BORDER,WS_EX_TRANSPARENT
+    PUSHBUTTON      "自动设置默认",AutoDefaultBtn,292,339,53,14
+    CONTROL         "",IDC_RICHEDIT21,"RichEdit20A",ES_MULTILINE | ES_AUTOHSCROLL | ES_READONLY | WS_BORDER | WS_TABSTOP,1,16,288,338
+END
+
+IDD_EDIT_DIALOG DIALOGEX 0, 0, 173, 323
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "调试命令"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    PUSHBUTTON      "发送",IDC_BUTTON1,125,0,48,14
+    PUSHBUTTON      "发送",IDC_BUTTON2,125,16,48,14
+    PUSHBUTTON      "发送",IDC_BUTTON3,125,33,48,14
+    PUSHBUTTON      "发送",IDC_BUTTON4,125,49,48,14
+    PUSHBUTTON      "发送",IDC_BUTTON5,125,65,48,14
+    PUSHBUTTON      "发送",IDC_BUTTON6,125,81,48,14
+    PUSHBUTTON      "发送",IDC_BUTTON7,125,97,48,14
+    EDITTEXT        IDC_EDIT1,0,0,123,14,ES_AUTOHSCROLL | ES_NOHIDESEL
+    PUSHBUTTON      "发送",IDC_BUTTON8,125,113,48,14
+    PUSHBUTTON      "发送",IDC_BUTTON9,125,129,48,14
+    PUSHBUTTON      "发送",IDC_BUTTON10,125,145,48,14
+    PUSHBUTTON      "发送",IDC_BUTTON11,125,161,48,14
+    PUSHBUTTON      "发送",IDC_BUTTON12,125,178,48,14
+    EDITTEXT        IDC_EDIT2,0,16,123,14,ES_AUTOHSCROLL | ES_NOHIDESEL
+    EDITTEXT        IDC_EDIT3,0,33,123,14,ES_AUTOHSCROLL | ES_NOHIDESEL
+    EDITTEXT        IDC_EDIT5,0,65,123,14,ES_AUTOHSCROLL | ES_NOHIDESEL
+    EDITTEXT        IDC_EDIT4,0,49,123,14,ES_AUTOHSCROLL | ES_NOHIDESEL
+    EDITTEXT        IDC_EDIT6,0,81,123,14,ES_AUTOHSCROLL | ES_NOHIDESEL
+    EDITTEXT        IDC_EDIT7,0,97,123,14,ES_AUTOHSCROLL | ES_NOHIDESEL
+    EDITTEXT        IDC_EDIT8,0,113,123,14,ES_AUTOHSCROLL | ES_NOHIDESEL
+    EDITTEXT        IDC_EDIT9,0,129,123,14,ES_AUTOHSCROLL | ES_NOHIDESEL
+    EDITTEXT        IDC_EDIT10,0,145,123,14,ES_AUTOHSCROLL | ES_NOHIDESEL
+    EDITTEXT        IDC_EDIT11,0,161,123,14,ES_AUTOHSCROLL | ES_NOHIDESEL
+    EDITTEXT        IDC_EDIT12,0,178,123,14,ES_AUTOHSCROLL | ES_NOHIDESEL
+    EDITTEXT        IDC_EDIT13,0,195,123,14,ES_AUTOHSCROLL | ES_NOHIDESEL
+    EDITTEXT        IDC_EDIT14,0,212,123,14,ES_AUTOHSCROLL | ES_NOHIDESEL
+    PUSHBUTTON      "发送",IDC_BUTTON13,125,195,48,14
+    PUSHBUTTON      "发送",IDC_BUTTON14,125,212,48,14
+    PUSHBUTTON      "发送",IDC_BUTTON15,125,228,48,14
+    EDITTEXT        IDC_EDIT16,0,244,123,14,ES_AUTOHSCROLL | ES_NOHIDESEL
+    EDITTEXT        IDC_EDIT15,0,228,123,14,ES_AUTOHSCROLL | ES_NOHIDESEL
+    PUSHBUTTON      "发送",IDC_BUTTON16,125,244,48,14
+    EDITTEXT        IDC_EDIT17,0,260,123,14,ES_AUTOHSCROLL | ES_NOHIDESEL
+    PUSHBUTTON      "发送",IDC_BUTTON17,125,260,48,14
+    EDITTEXT        IDC_EDIT19,0,292,123,14,ES_AUTOHSCROLL | ES_NOHIDESEL
+    PUSHBUTTON      "发送",IDC_BUTTON19,125,292,48,14
+    EDITTEXT        IDC_EDIT20,0,308,123,14,ES_AUTOHSCROLL | ES_NOHIDESEL
+    PUSHBUTTON      "发送",IDC_BUTTON20,125,308,48,14
+    EDITTEXT        IDC_EDIT18,0,276,123,14,ES_AUTOHSCROLL | ES_NOHIDESEL
+    PUSHBUTTON      "发送",IDC_BUTTON18,125,276,48,14
+END
+
+IDD_DIALOG1 DIALOGEX 0, 0, 319, 154
+STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD | WS_SYSMENU
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    CONTROL         "",IDC_MFCPROPERTYGRID_ORDER,"MfcPropertyGrid",0x100,1,3,314,133
+    PUSHBUTTON      "发送",SendOrderBtn,243,137,70,14
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION 1,0,0,1
+ PRODUCTVERSION 1,0,0,1
+ FILEFLAGSMASK 0x3fL
+#ifdef _DEBUG
+ FILEFLAGS 0x1L
+#else
+ FILEFLAGS 0x0L
+#endif
+ FILEOS 0x4L
+ FILETYPE 0x1L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "080403a8"
+        BEGIN
+            VALUE "CompanyName", "Whzt"
+            VALUE "FileVersion", "1.0.0.1"
+            VALUE "InternalName", "SerialPortTool.exe"
+            VALUE "OriginalFilename", "SerialPortTool.exe"
+            VALUE "ProductName", "电流校准工具"
+            VALUE "ProductVersion", "1.0.0.1"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x804, 936
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO
+BEGIN
+    IDD_SERIALPORTTOOL_DIALOG, DIALOG
+    BEGIN
+        RIGHTMARGIN, 518
+        VERTGUIDE, 140
+        VERTGUIDE, 214
+        BOTTOMMARGIN, 337
+        HORZGUIDE, 251
+    END
+
+    IDD_EDIT_DIALOG, DIALOG
+    BEGIN
+        MOCKUP, 0, 95, -555, -29, "G:\桌面背景\风景壁纸\03490_serenesunset_1366x768.jpg"
+        VERTGUIDE, 123
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 307
+    END
+
+    IDD_DIALOG1, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 312
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 147
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog Info
+//
+
+IDD_DIALOG1 DLGINIT
+BEGIN
+    IDC_MFCPROPERTYGRID_ORDER, 0x37c, 413, 0
+0x4d3c, 0x4346, 0x7250, 0x706f, 0x7265, 0x7974, 0x7247, 0x6469, 0x485f, 
+0x6165, 0x6564, 0x4372, 0x7274, 0x3e6c, 0x5254, 0x4555, 0x2f3c, 0x464d, 
+0x5043, 0x6f72, 0x6570, 0x7472, 0x4779, 0x6972, 0x5f64, 0x6548, 0x6461, 
+0x7265, 0x7443, 0x6c72, 0x3c3e, 0x464d, 0x5043, 0x6f72, 0x6570, 0x7472, 
+0x4779, 0x6972, 0x5f64, 0x6544, 0x6373, 0x6972, 0x7470, 0x6f69, 0x416e, 
+0x6572, 0x3e61, 0x4146, 0x534c, 0x3c45, 0x4d2f, 0x4346, 0x7250, 0x706f, 
+0x7265, 0x7974, 0x7247, 0x6469, 0x445f, 0x7365, 0x7263, 0x7069, 0x6974, 
+0x6e6f, 0x7241, 0x6165, 0x3c3e, 0x464d, 0x5043, 0x6f72, 0x6570, 0x7472, 
+0x4779, 0x6972, 0x5f64, 0x6c41, 0x6870, 0x6261, 0x7465, 0x6369, 0x6f4d, 
+0x6564, 0x463e, 0x4c41, 0x4553, 0x2f3c, 0x464d, 0x5043, 0x6f72, 0x6570, 
+0x7472, 0x4779, 0x6972, 0x5f64, 0x6c41, 0x6870, 0x6261, 0x7465, 0x6369, 
+0x6f4d, 0x6564, 0x3c3e, 0x464d, 0x5043, 0x6f72, 0x6570, 0x7472, 0x4779, 
+0x6972, 0x5f64, 0x6f4d, 0x6964, 0x6966, 0x6465, 0x7250, 0x706f, 0x7265, 
+0x6974, 0x7365, 0x543e, 0x5552, 0x3c45, 0x4d2f, 0x4346, 0x7250, 0x706f, 
+0x7265, 0x7974, 0x7247, 0x6469, 0x4d5f, 0x646f, 0x6669, 0x6569, 0x5064, 
+0x6f72, 0x6570, 0x7472, 0x6569, 0x3e73, 0x4d3c, 0x4346, 0x7250, 0x706f, 
+0x7265, 0x7974, 0x7247, 0x6469, 0x565f, 0x4453, 0x746f, 0x654e, 0x4c74, 
+0x6f6f, 0x3e6b, 0x5254, 0x4555, 0x2f3c, 0x464d, 0x5043, 0x6f72, 0x6570, 
+0x7472, 0x4779, 0x6972, 0x5f64, 0x5356, 0x6f44, 0x4e74, 0x7465, 0x6f4c, 
+0x6b6f, 0x3c3e, 0x464d, 0x5043, 0x6f72, 0x6570, 0x7472, 0x4779, 0x6972, 
+0x5f64, 0x6544, 0x6373, 0x6972, 0x7470, 0x6f69, 0x526e, 0x776f, 0x3e73, 
+0x3c33, 0x4d2f, 0x4346, 0x7250, 0x706f, 0x7265, 0x7974, 0x7247, 0x6469, 
+0x445f, 0x7365, 0x7263, 0x7069, 0x6974, 0x6e6f, 0x6f52, 0x7377, "\076" 
+    0
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// AFX_DIALOG_LAYOUT
+//
+
+IDD_SERIALPORTTOOL_DIALOG AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
+
+#endif    // 中文(简体，中国) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+#define _AFX_NO_SPLITTER_RESOURCES
+#define _AFX_NO_OLE_RESOURCES
+#define _AFX_NO_TRACKER_RESOURCES
+#define _AFX_NO_PROPERTY_RESOURCES
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_CHS)
+LANGUAGE 4, 2
+#pragma code_page(936)
+#include "res\SerialPortTool.rc2"  // 非 Microsoft Visual C++ 编辑的资源
+#include "l.CHS\afxres.rc"      // 标准组件
+#endif
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+
