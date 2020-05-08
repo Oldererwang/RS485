@@ -5,6 +5,8 @@
 #pragma once
 
 #define WM_ORDERMESSAGE  WM_USER+200
+#define WM_BYTEMESSAGE  WM_USER+201
+
 
 #ifndef _SECURE_ATL
 #define _SECURE_ATL 1

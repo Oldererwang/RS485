@@ -28,10 +28,9 @@ public:
 	CChildFrame *m_ChildFrame;
 	CFont m_editFont;
 	CFont m_firstFont;
-
+	CString cboStr;	//得到波特率进行判断
 
 	bool m_Connected;
-	bool m_Light;	//切换b类数据结构
 
 	// 对话框数据
 	enum { IDD = IDD_SERIALPORTTOOL_DIALOG };
@@ -58,6 +57,7 @@ protected:
 	// 实现
 protected:
 	HICON m_hIcon;
+	CChildFrame childframe;
 	CSerialPort m_SerialPort;
 	CBrush m_brush;		//画刷，背景颜色
 
@@ -70,6 +70,7 @@ protected:
 	long m_iRxLen;			//缓冲长度
 	int endFLag;			//缓冲行数
 	int dfInt;				//设置时间循环flag
+	int orderFlag;			//B类解析判断flag
 
 	CString knowStrData;		//Hex数据
 	CString groundCuA;			//A相接地电流
@@ -88,7 +89,7 @@ protected:
 	void HexStringFilter(CString &str);
 	CString ChangeCharstr2Hexstr(CString Charstr);	
 	//ASCII字符数组转16进制字符数组
-	void str2hex(char* str, char* hex);	
+	void str2hex(char* str, char* hex,int n);	
 	
 	CString hex2data(char* hex);					//字符数组转CString
 	void hexString2Byte(CString& in, BYTE *out);	//16进制CString转BYTE数组
@@ -103,6 +104,7 @@ protected:
 	afx_msg void OnPaint();
 	afx_msg HCURSOR OnQueryDragIcon();
 	afx_msg LRESULT OrderMessage(WPARAM wParam, LPARAM lParam);	 //接收子窗口发送的信息
+	afx_msg LRESULT ByteMessage(WPARAM wParam, LPARAM lParam);	 //接收子窗口发送的信息
 	afx_msg BOOL OnDeviceChange(UINT nEventType, DWORD dwData);	//串口热插拔消息
 	DECLARE_MESSAGE_MAP()
 public:
@@ -143,7 +145,6 @@ public:
 	afx_msg void OnBnClickedCheck6();
 	afx_msg void OnBnClickedCheck7();
 	afx_msg void OnBnClickedButtonSave();
-	afx_msg void OnCbnSelchangeCboSerialPort();
 	afx_msg void OnBnClickedshowstatebtn();
 	CString editIp1;
 	CString editIp2;

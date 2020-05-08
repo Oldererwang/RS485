@@ -1,4 +1,4 @@
-// ChildFrame.cpp : ÊµÏÖÎÄ¼ş
+ï»¿// ChildFrame.cpp : å®ç°æ–‡ä»¶
 //
 
 #include "stdafx.h"
@@ -7,7 +7,7 @@
 #include "afxdialogex.h"
 
 
-// CChildFrame ¶Ô»°¿ò
+// CChildFrame å¯¹è¯æ¡†
 
 IMPLEMENT_DYNAMIC(CChildFrame, CDialogEx)
 
@@ -28,100 +28,97 @@ void CChildFrame::DoDataExchange(CDataExchange* pDX)
 
 
 BEGIN_MESSAGE_MAP(CChildFrame, CDialogEx)
-	
+
 	ON_BN_CLICKED(SendOrderBtn, &CChildFrame::OnBnClickedSendorderbtn)
 	ON_STN_CLICKED(IDC_MFCPROPERTYGRID_ORDER, &CChildFrame::OnStnClickedMfcpropertygridOrder)
 
 END_MESSAGE_MAP()
 
 
-// CChildFrame ÏûÏ¢´¦Àí³ÌĞò
+// CChildFrame æ¶ˆæ¯å¤„ç†ç¨‹åº
 
 
 
-void CChildFrame::OnBnClickedSendorderbtn()		//·¢ËÍÖ¸ÁîµÄ¸ñÊ½¿ÉÄÜÓĞÎÊÌâ
+void CChildFrame::OnBnClickedSendorderbtn()		//å‘é€æ ¼å¼æŒ‡ä»¤
 {
-	if ( m_propertyGrid.GetProperty(6)->GetValue() != CString(_T("")) )
+	if (m_propertyGrid.GetProperty(6)->GetValue() != CString(_T("")))
 	{
-		CString str1,str2,str3,str4,str5,str6,strCstr;
+		CString str1, str2, str3, str4, str5, str6, strCstr;
 		str1 = m_propertyGrid.GetProperty(0)->GetValue();
 		str2 = m_propertyGrid.GetProperty(2)->GetValue();
 		str3 = m_propertyGrid.GetProperty(3)->GetValue();
 		str4 = m_propertyGrid.GetProperty(4)->GetValue();
 		str5 = m_propertyGrid.GetProperty(5)->GetValue();
-		str6 = m_propertyGrid.GetProperty(6)->GetValue();	
+		str6 = m_propertyGrid.GetProperty(6)->GetValue();
 
-		char strChar[18] = {0};
-		str2hex(str2,strChar);
-		strCstr.Format("%s",strChar);
+		char strChar[18] = { 0 };
+		str2hex(str2, strChar);
+		strCstr.Format("%s", strChar);
+		BYTE orderData[32] = { 0 };
 
 		if ("0xC00055AA" == str1)
 		{
 			CString strDate = _T("AA5500C014000000") + strCstr + str3 + str4 + str5 + str6;
-			for (int i = 2;i < strDate.GetLength();i+=3)
+			for (int i = 2; i < strDate.GetLength(); i += 3)
 			{
-				strDate.Insert(i,_T(" "));
+				strDate.Insert(i, _T(" "));
 			}
-			::SendMessage(this->GetParent()->m_hWnd, WM_ORDERMESSAGE, WPARAM(TRUE) ,(LPARAM)(LPCTSTR)strDate);
-			(LPARAM)strDate.GetBuffer(strDate.GetLength());
-			strDate.ReleaseBuffer();
+			int wode = HexStrToHex(strDate, orderData);
+
+			::SendMessage(this->GetParent()->m_hWnd, WM_BYTEMESSAGE, WPARAM(wode), (LPARAM)orderData);
 		}
 
 		if ("0xC10055AA" == str1)
 		{
 			CString strDate = _T("AA5500C114000000") + strCstr + str3 + str4 + str5 + str6;
-			for (int i = 2;i < strDate.GetLength();i+=3)
+			for (int i = 2; i < strDate.GetLength(); i += 3)
 			{
-				strDate.Insert(i,_T(" "));
+				strDate.Insert(i, _T(" "));
 			}
-			::SendMessage(this->GetParent()->m_hWnd, WM_ORDERMESSAGE, WPARAM(TRUE) ,(LPARAM)(LPCTSTR)strDate);
-			(LPARAM)strDate.GetBuffer(strDate.GetLength());
-			strDate.ReleaseBuffer();
+			int wode = HexStrToHex(strDate, orderData);
+			::SendMessage(this->GetParent()->m_hWnd, WM_BYTEMESSAGE, WPARAM(wode), (LPARAM)(LPCTSTR)orderData);
 		}
 
 		if ("0xC20055AA" == str1)
 		{
 			CString strDate = _T("AA5500C214000000") + strCstr + str3 + str4 + str5 + str6;
-			for (int i = 2;i < strDate.GetLength();i+=3)
+			for (int i = 2; i < strDate.GetLength(); i += 3)
 			{
-				strDate.Insert(i,_T(" "));
+				strDate.Insert(i, _T(" "));
 			}
-			::SendMessage(this->GetParent()->m_hWnd, WM_ORDERMESSAGE, WPARAM(TRUE) ,(LPARAM)(LPCTSTR)strDate);
-			(LPARAM)strDate.GetBuffer(strDate.GetLength());
-			strDate.ReleaseBuffer();
+			int wode = HexStrToHex(strDate, orderData);
+			::SendMessage(this->GetParent()->m_hWnd, WM_BYTEMESSAGE, WPARAM(wode), (LPARAM)(LPCTSTR)orderData);
 		}
 
 		if ("0xC30055AA" == str1)
 		{
 			CString strDate = _T("AA5500C314000000") + strCstr + str3 + str4 + str5 + str6;
-			for (int i = 2;i < strDate.GetLength();i+=3)
+			for (int i = 2; i < strDate.GetLength(); i += 3)
 			{
-				strDate.Insert(i,_T(" "));
+				strDate.Insert(i, _T(" "));
 			}
-			::SendMessage(this->GetParent()->m_hWnd, WM_ORDERMESSAGE, WPARAM(TRUE) ,(LPARAM)(LPCTSTR)strDate);
-			(LPARAM)strDate.GetBuffer(strDate.GetLength());
-			strDate.ReleaseBuffer();
+			int wode = HexStrToHex(strDate, orderData);
+			::SendMessage(this->GetParent()->m_hWnd, WM_BYTEMESSAGE, WPARAM(wode), (LPARAM)(LPCTSTR)orderData);
 		}
 		if ("0xC40055AA" == str1)
 		{
 			CString strDate = _T("AA5500C414000000") + strCstr + str3 + str4 + str5 + str6;
-			for (int i = 2;i < strDate.GetLength();i+=3)
+			for (int i = 2; i < strDate.GetLength(); i += 3)
 			{
-				strDate.Insert(i,_T(" "));
+				strDate.Insert(i, _T(" "));
 			}
-			::SendMessage(this->GetParent()->m_hWnd, WM_ORDERMESSAGE, WPARAM(TRUE) ,(LPARAM)(LPCTSTR)strDate);
-			(LPARAM)strDate.GetBuffer(strDate.GetLength());
-			strDate.ReleaseBuffer();
+			int wode = HexStrToHex(strDate, orderData);
+			::SendMessage(this->GetParent()->m_hWnd, WM_BYTEMESSAGE, WPARAM(wode), (LPARAM)(LPCTSTR)orderData);
 		}
 	}
 
 
 
-	//½«ÃüÁî¿òÖĞµÄÃüÁî×Ö·û´®ĞÎÊ½·¢ËÍ³öÈ¥
+	//å°†å‘½ä»¤æ¡†ä¸­çš„å‘½ä»¤å­—ç¬¦ä¸²å½¢å¼å‘é€å‡ºå»
 	//::SendMessage(this->GetParent()->m_hWnd, WM_ORDERMESSAGE, WPARAM(TRUE) ,(LPARAM)(LPCTSTR)str);
 	//(LPARAM)str.GetBuffer(str.GetLength()));
 	//str.ReleaseBuffer();
-	// TODO: ÔÚ´ËÌí¼Ó¿Ø¼şÍ¨Öª´¦Àí³ÌĞò´úÂë
+	// TODO: åœ¨æ­¤æ·»åŠ æ§ä»¶é€šçŸ¥å¤„ç†ç¨‹åºä»£ç 
 }
 
 
@@ -129,17 +126,20 @@ BOOL CChildFrame::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
 
-	// TODO:  ÔÚ´ËÌí¼Ó¶îÍâµÄ³õÊ¼»¯
- 
+	// TODO:  åœ¨æ­¤æ·»åŠ é¢å¤–çš„åˆå§‹åŒ–
+	m_editFont.CreatePointFont(140, _T("Times New Roman"));
+	m_propertyGrid.SetFont(&m_editFont);
+	m_propertyGrid.SetFont(&m_editFont);
+
 	return TRUE;  // return TRUE unless you set the focus to a control
-	// Òì³£: OCX ÊôĞÔÒ³Ó¦·µ»Ø FALSE
+	// å¼‚å¸¸: OCX å±æ€§é¡µåº”è¿”å› FALSE
 }
 
 
 void CChildFrame::OnStnClickedMfcpropertygridOrder()
 {
-	// TODO: ÔÚ´ËÌí¼Ó¿Ø¼şÍ¨Öª´¦Àí³ÌĞò´úÂë	
-	CString str1,str2,str3,str4,str5,str6;
+	// TODO: åœ¨æ­¤æ·»åŠ æ§ä»¶é€šçŸ¥å¤„ç†ç¨‹åºä»£ç 	
+	CString str1, str2, str3, str4, str5, str6;
 	str1 = m_propertyGrid.GetProperty(0)->GetValue();
 	str2 = m_propertyGrid.GetProperty(2)->GetValue();
 	str3 = m_propertyGrid.GetProperty(3)->GetValue();
@@ -147,40 +147,39 @@ void CChildFrame::OnStnClickedMfcpropertygridOrder()
 	str5 = m_propertyGrid.GetProperty(5)->GetValue();
 	str6 = _T("14000000");
 
-	char wode1[9] = {0};
-	char wode2[9] = {0};
-	CString strTemp1 = str1.Mid(8,2);
-	str2hex(str2.Mid(0,4),wode1);
-	str2hex(str2.Mid(4,4),wode2);
-	CString strTemp3 = str3.Mid(8,2);
-	CString wodetian1,wodetian2;
-	wodetian1.Format("%s",wode1);
-	wodetian2.Format("%s",wode2);
+	char wode1[9] = { 0 };
+	char wode2[9] = { 0 };
+	CString strTemp1 = str1.Mid(8, 2);
+	str2hex(str2.Mid(0, 4), wode1);
+	str2hex(str2.Mid(4, 4), wode2);
+	CString strTemp3 = str3.Mid(8, 2);
+	CString wodetian1, wodetian2;
+	wodetian1.Format("%s", wode1);
+	wodetian2.Format("%s", wode2);
 
-	CString str;	//Ğ£ÑéºÍ
-	for (int i=0;i<8;i+=2)
+	CString str;	//æ ¡éªŒå’Œ
+	for (int i = 0; i < 8; i += 2)
 	{
-		int wode1 = _tcstoul(_T(wodetian1.Mid(i,2)),NULL,16);
-		int wode2 = _tcstoul(_T(wodetian2.Mid(i,2)),NULL,16);
-		int wode3 = _tcstoul(_T(str3.Mid(i,2)),NULL,16);
-		int wode4 = _tcstoul(_T(str4.Mid(i,2)),NULL,16);
-		int wode5 = _tcstoul(_T(str5.Mid(i,2)),NULL,16);
+		int wode1 = _tcstoul(_T(wodetian1.Mid(i, 2)), NULL, 16);
+		int wode2 = _tcstoul(_T(wodetian2.Mid(i, 2)), NULL, 16);
+		int wode3 = _tcstoul(_T(str3.Mid(i, 2)), NULL, 16);
+		int wode4 = _tcstoul(_T(str4.Mid(i, 2)), NULL, 16);
+		int wode5 = _tcstoul(_T(str5.Mid(i, 2)), NULL, 16);
 
-		str =str + int10ToStr16(wode1 + wode2 + wode3 + wode4 + wode5);
+		str = str + int10ToStr16(wode1 + wode2 + wode3 + wode4 + wode5);
 	}
-	CMFCPropertyGridProperty *pSelected;
+	CMFCPropertyGridProperty* pSelected;
 	pSelected = m_propertyGrid.GetProperty(6);
 	pSelected->SetValue(str);
-
 }
 
-void CChildFrame::str2hex(CString str, char* hex)	//Êı¾İ³¤¶È250 Õâ¸öº¯Êı¿ÉÄÜĞèÒª¸ü¸Ä³¤¶È
+void CChildFrame::str2hex(CString str, char* hex)	//æ•°æ®é•¿åº¦250 è¿™ä¸ªå‡½æ•°å¯èƒ½éœ€è¦æ›´æ”¹é•¿åº¦
 {
 	const char* cHex = "0123456789ABCDEF";
-	int i=0;
-	for(int j =0; j < str.GetLength(); j++)
+	int i = 0;
+	for (int j = 0; j < str.GetLength(); j++)
 	{
-		unsigned int a =  (unsigned int) str.GetAt(j);
+		unsigned int a = (unsigned int)str.GetAt(j);
 		hex[i++] = cHex[(a & 0xf0) >> 4];
 		hex[i++] = cHex[(a & 0x0f)];
 	}
@@ -190,23 +189,74 @@ CString CChildFrame::int10ToStr16(LONGLONG a)
 {
 	int y = 0;
 	CString s;
-	if(a==0)//0±È½ÏÌØÊâ£¬µ¥¶À´¦Àí
+	if (a == 0)//0æ¯”è¾ƒç‰¹æ®Šï¼Œå•ç‹¬å¤„ç†
 	{
 		s = _T("00");
 		return s;
 	}
 
-	while(a>0)//´óÓÚ0µÄÊı
+	while (a > 0)//å¤§äº0çš„æ•°
 	{
-		y=a % 16;  //ÇóÓà
-		if(y < 10)   //Ğ¡ÓÚ10µÄÓàÊı
+		y = a % 16;  //æ±‚ä½™
+		if (y < 10)   //å°äº10çš„ä½™æ•°
 		{
-			s=char('0'+y)+s;	//ÀûÓÃ×Ö·ûµÄascllÂëÔÚ×Ö·û´®Ç°ÃæÆ´½Ó
+			s = char('0' + y) + s;	//åˆ©ç”¨å­—ç¬¦çš„ascllç åœ¨å­—ç¬¦ä¸²å‰é¢æ‹¼æ¥
 		}
 		else
-			s=char('A'-10+y)+s;  //´óÓÚ9µÄÓàÊıÓÃABCDE±íÊ¾
-		a=a/16;   
+			s = char('A' - 10 + y) + s;  //å¤§äº9çš„ä½™æ•°ç”¨ABCDEè¡¨ç¤º
+		a = a / 16;
 	}
 	return s;
+}
+
+int CChildFrame::HexStrToHex(CString str, BYTE* data)
+{
+	int t, t1;
+	int rlen = 0, len = str.GetLength();
+
+	if (len == 1)
+	{
+		char h = str[0];
+		t = HexChar(h);
+		data[0] = (BYTE)t;
+		rlen++;
+	}
+	//data.SetSize(len/2);
+
+	for (int i = 0; i < len;)
+	{
+		char l, h = str[i];
+		if (h == ' ')
+		{
+			i++;
+			continue;
+		}
+		i++;
+		if (i >= len)
+			break;
+		l = str[i];
+		t = HexChar(h);
+		t1 = HexChar(l);
+		if ((t == 16) || (t1 == 16))
+			break;
+		else
+			t = t * 16 + t1;
+		i++;
+		data[rlen] = (BYTE)t;
+		rlen++;
+	}
+	return rlen;
+}
+
+int CChildFrame::HexChar(char c)
+{
+	if ((c >= '0') && (c <= '9'))
+		return c - 0x30;
+	else if ((c >= 'A') && (c <= 'F'))
+		return c - 'A' + 10;
+	else if ((c >= 'a') && (c <= 'f'))
+		return c - 'a' + 10;
+	else
+		return 0x10;
 }
 
