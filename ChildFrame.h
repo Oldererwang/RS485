@@ -14,6 +14,8 @@ public:
 	virtual ~CChildFrame();
 	CFont m_editFont;
 
+	bool m_Connected;
+
 // 对话框数据
 	enum { IDD = IDD_DIALOG1 };
 
@@ -36,4 +38,9 @@ public:
 	//HexChar函数的功能是将16进制字符由ASCII码转为相应大小的16进制数
 	int HexChar(char c);
 
+	afx_msg void OnBnClickedSettimesendbtn();
+	afx_msg void OnTimer(UINT_PTR nIDEvent);
+	afx_msg void OnBnClickedDefalutbtn();
+protected:
+	afx_msg LRESULT OnChildmessage(WPARAM wParam, LPARAM lParam);
 };

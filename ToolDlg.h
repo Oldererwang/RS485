@@ -174,4 +174,12 @@ public:
 	afx_msg void OnNMClickListCurrent(NMHDR* pNMHDR, LRESULT* pResult);
 	CRichEditCtrl m_CtrRichEdit;
 	CString m_StrRichEdit;
+	//读取串口大小位置记录
+	BOOL ReadWndPosition();
+	//写入窗口位置大小记录
+	BOOL WriteWndPosition();
+	//销毁窗口
+	virtual BOOL DestroyWindow();
+protected:
+	afx_msg LRESULT OnTochildMessage(WPARAM wParam, LPARAM lParam);
 };

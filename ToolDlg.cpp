@@ -132,7 +132,7 @@ BEGIN_MESSAGE_MAP(CToolDlg, CDialog)
 	ON_BN_CLICKED(AutoDefaultBtn, &CToolDlg::OnBnClickedAutodefaultbtn)
 	ON_NOTIFY(NM_CLICK, IDC_LIST4, &CToolDlg::OnNMClickListCurrent)
 
-
+	ON_WM_DESTROY()
 
 END_MESSAGE_MAP()
 
@@ -148,6 +148,44 @@ BOOL CToolDlg::OnInitDialog()
 	SetIcon(m_hIcon, TRUE);			// 设置大图标
 	SetIcon(m_hIcon, FALSE);		// 设置小图标
 
+	ReadWndPosition();		//载入窗口位置
+
+	//这一块是窗口控件记忆功能，配置ini文件
+	CFileFind finder;
+	CString bundrateStr, IpStr, portStr;
+	bool ifFind = finder.FindFile(_T(".\\Defalut.ini"));
+	if (!ifFind)	//ini文件初始化
+	{
+		::WritePrivateProfileString("IDC_CBO_BAUD_RATE", "BundRate", "115200", ".\\Defalut.ini");
+		::WritePrivateProfileString("IpAddress", "IP", "192.168.000.001", ".\\Defalut.ini");
+		::WritePrivateProfileString("Port", "port","6666", ".\\Defalut.ini");
+		::WritePrivateProfileString("TimeSet", "time", "1000", ".\\Defalut.ini");
+	}
+
+	//得到ini文件中的值
+	::GetPrivateProfileString("IDC_CBO_BAUD_RATE", "BundRate", "115200", bundrateStr.GetBuffer(20), 20, ".\\Defalut.ini");
+	::GetPrivateProfileString("IpAddress", "IP", "192.168.000.001",IpStr.GetBuffer(20),20, ".\\Defalut.ini");
+	::GetPrivateProfileString("Port", "port", "6666",portStr.GetBuffer(10),10, ".\\Defalut.ini");
+	bundrateStr.ReleaseBuffer();
+	IpStr.ReleaseBuffer();
+	portStr.ReleaseBuffer();
+	//从ini文件读取设置
+	GetDlgItem(IDC_EDITPort)->SetWindowTextA(portStr);
+
+	int pointFind = IpStr.Find(".");
+	CString IpStrr1 = IpStr.Left(pointFind);
+	IpStr.Delete(0,pointFind+1);
+	pointFind = IpStr.Find(".");
+	CString IpStrr2 = IpStr.Left(pointFind);
+	IpStr.Delete(0,pointFind+1);
+	pointFind = IpStr.Find(".");
+	CString IpStrr3 = IpStr.Left(pointFind);
+	IpStr.Delete(0,pointFind+1);
+	CString IpStrr4 = IpStr;
+	GetDlgItem(EditIP1)->SetWindowTextA(IpStrr1);
+	GetDlgItem(EditIp2)->SetWindowTextA(IpStrr2);
+	GetDlgItem(EditIP3)->SetWindowTextA(IpStrr3);
+	GetDlgItem(EditIP4)->SetWindowTextA(IpStrr4);
 
 	/*这一部分是改变控件内字体的大小*/
 	m_editFont.CreatePointFont(150, _T("Times New Roman"));
@@ -276,13 +314,8 @@ BOOL CToolDlg::OnInitDialog()
 	orderEditDlg = new COrderEdit;
 	orderEditDlg->Create(IDD_EDIT_DIALOG, this);
 	orderEditDlg->SetWindowPos(&CWnd::wndTop, (rt1.right + 30), rt3.top + 10, 0, 0, SWP_NOSIZE);	//设置子窗口位置
-	//编辑框指定文本
-	GetDlgItem(EditIP1)->SetWindowTextA("192");
-	GetDlgItem(EditIp2)->SetWindowTextA("168");
-	GetDlgItem(EditIP3)->SetWindowTextA("001");
-	GetDlgItem(EditIP4)->SetWindowTextA("100");
-	GetDlgItem(IDC_EDITPort)->SetWindowTextA("6666");
 
+	//编辑框指定文本
 	orderEditDlg->SetDlgItemText(IDC_EDIT1, ">DEVICE_ID:ZTZN0001");
 	orderEditDlg->SetDlgItemText(IDC_EDIT2, ">TIME:2019-10-20@20:30:00");
 	orderEditDlg->SetDlgItemText(IDC_EDIT3, ">DEVICE_IP:192.168.001.100");
@@ -370,7 +403,7 @@ BOOL CToolDlg::OnInitDialog()
 
 	UINT uBaudRate[] = { 300,600,1200,2400,4800,9600,14400,19200,38400,56000,57600,115200,230400,460800,921600 };
 	CString Parity[] = { _T("None"),_T("Odd"),_T("Even"),_T("Mark"),_T("Space") };
-	//CString CurrentSet[]={_T("3.5A"),_T("100A")};
+
 
 	CString StrTemp;
 
@@ -382,6 +415,8 @@ BOOL CToolDlg::OnInitDialog()
 	}
 	StrTemp.Format("%d", 115200);
 	m_cboBaudRate.SetCurSel(m_cboBaudRate.FindString(0, StrTemp));
+
+	m_cboBaudRate.SetCurSel(m_cboBaudRate.FindString(0, _T(bundrateStr)));
 
 	// 列出系统所有的串口
 	for (int i = 1; i < 200; ++i)
@@ -671,7 +706,6 @@ void CToolDlg::OnTimer(UINT_PTR nIDEvent)
 
 LPARAM CToolDlg::OnComm(WPARAM ch, LPARAM port)
 {
-	UpdateData(true);
 	/************************************************************************/
 	/* B类数据结构解析                                                         */
 	/************************************************************************/
@@ -755,23 +789,22 @@ LPARAM CToolDlg::OnComm(WPARAM ch, LPARAM port)
 			}
 		}
 
-		//0xA100解析
+		//解析
 		if (0 == orderFlag)
 		{
 			if (m_iRxLen == 148)
 			{
+				//解析设备ID
+				m_CtrRichEdit.SetSel(-1, -1);
+				m_CtrRichEdit.ReplaceSel(_T("设备ID："));
+				m_CtrRichEdit.ReplaceSel(msgNotice.Mid(8, 8) + _T("\r\n"));
+
 				for (int i = 0; i < 132; i++)
 				{
 					m_HexData[i] = m_RxData[i + 16];
 				}
 				str2hex(m_HexData, hexData , 264 );		//维护时str2hex可能需要更改参数
 				knowStrData = hex2data(hexData);	//得到需要解析的字符串knowStrData
-
-				//解析设备ID
-				m_CtrRichEdit.SetSel(-1, -1);
-				m_CtrRichEdit.ReplaceSel(_T("设备ID："));
-				m_CtrRichEdit.ReplaceSel(msgNotice.Mid(8, 8));
-				m_CtrRichEdit.ReplaceSel("\r\n");
 
 				//解析日期和时间
 				CString time1 = knowStrData.Mid(0, 2);; 	//时间	
@@ -795,10 +828,10 @@ LPARAM CToolDlg::OnComm(WPARAM ch, LPARAM port)
 				date2.Format("%d", dateInt2);
 				date3.Format("%d", dateInt3);
 				CString systemDate = _T("20") + date3 + _T("-") + date2 + _T("-") + date1;
+				
+				m_CtrRichEdit.SetSel(-1, -1);
 				m_CtrRichEdit.ReplaceSel(_T("日期时间："));
-				m_CtrRichEdit.ReplaceSel(systemDate + _T("  "));
-				m_CtrRichEdit.ReplaceSel(systemTime);
-				m_CtrRichEdit.ReplaceSel("\r\n");
+				m_CtrRichEdit.ReplaceSel(systemDate + _T("  ") + systemTime + _T("\r\n"));
 
 				//解析运行时长，电压和电流
 				CString strRunTime;
@@ -1070,11 +1103,6 @@ LPARAM CToolDlg::OnComm(WPARAM ch, LPARAM port)
 		m_iRxLen++;				//控制行数
 		if ((m_RxData[m_iRxLen - 2] == '\r' && m_RxData[m_iRxLen - 1] == '\n'))
 		{
-			//if (m_RxData[0] == 'T' && m_RxData[1] == 'i' && m_RxData[2] == 'm' && m_RxData[3] == 'e')
-			//{
-			//	m_StrReceiveData += "\r\n";
-			//	SetDlgItemText(IDC_EDIT_RECEIVE_DATA, m_StrReceiveData);
-			//}
 			CString mLeft4 = msgNotice.Left(4);
 
 			if ("设置" != mLeft4)
@@ -1548,133 +1576,136 @@ void CToolDlg::OnBnClickedSendorderButton1()
 
 void CToolDlg::OnBnClickedButtonCal()
 {	// TODO: 在此添加控件通知处理程序代码
-	if (m_ListCurrent.GetItemText(0, 1) != "")	//判断电流有数据时才做计算
+	if (m_Connected)
 	{
-		//得到m_ListCurrent上的电流值
-		CString strCh0 = m_ListCurrent.GetItemText(0, 2);
-		CString strCh1 = m_ListCurrent.GetItemText(1, 2);
-		CString strCh2 = m_ListCurrent.GetItemText(2, 2);
-		CString strCh3 = m_ListCurrent.GetItemText(3, 2);
-		CString strCh4 = m_ListCurrent.GetItemText(4, 2);
-		CString strCh5 = m_ListCurrent.GetItemText(5, 2);
-		CString strCh6 = m_ListCurrent.GetItemText(6, 2);
-
-		if (0 == m_cboCurrent.GetCurSel())
+		if (m_ListCurrent.GetItemText(0, 1) != "")	//判断电流有数据时才做计算
 		{
-			CString bCh0, bCh1, bCh2, bCh3, bCh4, bCh5, bCh6;
-			bCh0.Format(_T("%.4f"), atof(strCh0));
-			bCh1.Format(_T("%.4f"), atof(strCh1));
-			bCh2.Format(_T("%.4f"), atof(strCh2));
-			bCh3.Format(_T("%.4f"), atof(strCh3));
-			bCh4.Format(_T("%.4f"), atof(strCh4));
-			bCh5.Format(_T("%.4f"), atof(strCh5));
-			bCh6.Format(_T("%.4f"), atof(strCh6));
+			//得到m_ListCurrent上的电流值
+			CString strCh0 = m_ListCurrent.GetItemText(0, 2);
+			CString strCh1 = m_ListCurrent.GetItemText(1, 2);
+			CString strCh2 = m_ListCurrent.GetItemText(2, 2);
+			CString strCh3 = m_ListCurrent.GetItemText(3, 2);
+			CString strCh4 = m_ListCurrent.GetItemText(4, 2);
+			CString strCh5 = m_ListCurrent.GetItemText(5, 2);
+			CString strCh6 = m_ListCurrent.GetItemText(6, 2);
 
-			m_currentSet_List.SetItemText(0, 1, AvoidLarge(bCh0));
-			m_currentSet_List.SetItemText(1, 1, AvoidLarge(bCh1));
-			m_currentSet_List.SetItemText(2, 1, AvoidLarge(bCh2));
-			m_currentSet_List.SetItemText(3, 1, AvoidLarge(bCh3));
-			m_currentSet_List.SetItemText(4, 1, AvoidLarge(bCh4));
-			m_currentSet_List.SetItemText(5, 1, AvoidLarge(bCh5));
-			m_currentSet_List.SetItemText(6, 1, AvoidLarge(bCh6));
-		}
+			if (0 == m_cboCurrent.GetCurSel())
+			{
+				CString bCh0, bCh1, bCh2, bCh3, bCh4, bCh5, bCh6;
+				bCh0.Format(_T("%.4f"), atof(strCh0));
+				bCh1.Format(_T("%.4f"), atof(strCh1));
+				bCh2.Format(_T("%.4f"), atof(strCh2));
+				bCh3.Format(_T("%.4f"), atof(strCh3));
+				bCh4.Format(_T("%.4f"), atof(strCh4));
+				bCh5.Format(_T("%.4f"), atof(strCh5));
+				bCh6.Format(_T("%.4f"), atof(strCh6));
 
-		if (1 == m_cboCurrent.GetCurSel())		//当电流为3.5A时
-		{
-			CString bCh0 = (m_currentSet_List.GetItemText(0, 1)).Mid(0, 6);		//得到0时的b值	
-			CString bCh1 = (m_currentSet_List.GetItemText(1, 1)).Mid(0, 6);
-			CString bCh2 = (m_currentSet_List.GetItemText(2, 1)).Mid(0, 6);
-			CString bCh3 = (m_currentSet_List.GetItemText(3, 1)).Mid(0, 6);
-			CString bCh4 = (m_currentSet_List.GetItemText(4, 1)).Mid(0, 6);
-			CString bCh5 = (m_currentSet_List.GetItemText(5, 1)).Mid(0, 6);
-			CString bCh6 = (m_currentSet_List.GetItemText(6, 1)).Mid(0, 6);
+				m_currentSet_List.SetItemText(0, 1, AvoidLarge(bCh0));
+				m_currentSet_List.SetItemText(1, 1, AvoidLarge(bCh1));
+				m_currentSet_List.SetItemText(2, 1, AvoidLarge(bCh2));
+				m_currentSet_List.SetItemText(3, 1, AvoidLarge(bCh3));
+				m_currentSet_List.SetItemText(4, 1, AvoidLarge(bCh4));
+				m_currentSet_List.SetItemText(5, 1, AvoidLarge(bCh5));
+				m_currentSet_List.SetItemText(6, 1, AvoidLarge(bCh6));
+			}
 
-			CString kCh0, kCh1, kCh2, kCh3, kCh4, kCh5, kCh6;
-			kCh0.Format(_T("%.3f"), (3.5 + atof(bCh0)) / atof(strCh0));
-			kCh1.Format(_T("%.3f"), (3.5 + atof(bCh1)) / atof(strCh1));
-			kCh2.Format(_T("%.3f"), (3.5 + atof(bCh2)) / atof(strCh2));
-			kCh3.Format(_T("%.3f"), (3.5 + atof(bCh3)) / atof(strCh3));
-			kCh4.Format(_T("%.3f"), (3.5 + atof(bCh4)) / atof(strCh4));
-			kCh5.Format(_T("%.3f"), (3.5 + atof(bCh5)) / atof(strCh5));
-			kCh6.Format(_T("%.3f"), (3.5 + atof(bCh6)) / atof(strCh6));
+			if (1 == m_cboCurrent.GetCurSel())		//当电流为3.5A时
+			{
+				CString bCh0 = (m_currentSet_List.GetItemText(0, 1)).Mid(0, 6);		//得到0时的b值	
+				CString bCh1 = (m_currentSet_List.GetItemText(1, 1)).Mid(0, 6);
+				CString bCh2 = (m_currentSet_List.GetItemText(2, 1)).Mid(0, 6);
+				CString bCh3 = (m_currentSet_List.GetItemText(3, 1)).Mid(0, 6);
+				CString bCh4 = (m_currentSet_List.GetItemText(4, 1)).Mid(0, 6);
+				CString bCh5 = (m_currentSet_List.GetItemText(5, 1)).Mid(0, 6);
+				CString bCh6 = (m_currentSet_List.GetItemText(6, 1)).Mid(0, 6);
 
-			m_currentSet_List.SetItemText(0, 2, AvoidLarge(kCh0) + _T(" -") + AvoidLarge(bCh0));
-			m_currentSet_List.SetItemText(1, 2, AvoidLarge(kCh1) + _T(" -") + AvoidLarge(bCh1));
-			m_currentSet_List.SetItemText(2, 2, AvoidLarge(kCh2) + _T(" -") + AvoidLarge(bCh2));
-			m_currentSet_List.SetItemText(3, 2, AvoidLarge(kCh3) + _T(" -") + AvoidLarge(bCh3));
-			m_currentSet_List.SetItemText(4, 2, AvoidLarge(kCh4) + _T(" -") + AvoidLarge(bCh4));
-			m_currentSet_List.SetItemText(5, 2, AvoidLarge(kCh5) + _T(" -") + AvoidLarge(bCh5));
-			m_currentSet_List.SetItemText(6, 2, AvoidLarge(kCh6) + _T(" -") + AvoidLarge(bCh6));
-		}
-		int wode = 1;
+				CString kCh0, kCh1, kCh2, kCh3, kCh4, kCh5, kCh6;
+				kCh0.Format(_T("%.3f"), (3.5 + atof(bCh0)) / atof(strCh0));
+				kCh1.Format(_T("%.3f"), (3.5 + atof(bCh1)) / atof(strCh1));
+				kCh2.Format(_T("%.3f"), (3.5 + atof(bCh2)) / atof(strCh2));
+				kCh3.Format(_T("%.3f"), (3.5 + atof(bCh3)) / atof(strCh3));
+				kCh4.Format(_T("%.3f"), (3.5 + atof(bCh4)) / atof(strCh4));
+				kCh5.Format(_T("%.3f"), (3.5 + atof(bCh5)) / atof(strCh5));
+				kCh6.Format(_T("%.3f"), (3.5 + atof(bCh6)) / atof(strCh6));
 
-		if (2 == m_cboCurrent.GetCurSel())		//当电流为100A时
-		{
-			CString kCh0, kCh1, kCh2, kCh3, kCh4, kCh5, kCh6;						//3.5A时的k值
-			CString kTCh0, kTCh1, kTCh2, kTCh3, kTCh4, kTCh5, kTCh6;				//100A时的k值
-			CString bTCh0, bTCh1, bTCh2, bTCh3, bTCh4, bTCh5, bTCh6;				//100A时的b值
-			CString curCh0, curCh1, curCh2, curCh3, curCh4, curCh5, curCh6;		//3.5A时电流值
-			int i0 = 0;
-			int i1 = 0;
-			int i2 = 0;
-			int i3 = 0;
-			int i4 = 0;
-			int i5 = 0;
-			int i6 = 0;
-			while ((m_currentSet_List.GetItemText(0, 2)).Mid(i0, 1) != " ")
-				i0++;
-			while ((m_currentSet_List.GetItemText(1, 2)).Mid(i1, 1) != " ")
-				i1++;
-			while ((m_currentSet_List.GetItemText(2, 2)).Mid(i2, 1) != " ")
-				i2++;
-			while ((m_currentSet_List.GetItemText(3, 2)).Mid(i3, 1) != " ")
-				i3++;
-			while ((m_currentSet_List.GetItemText(4, 2)).Mid(i4, 1) != " ")
-				i4++;
-			while ((m_currentSet_List.GetItemText(5, 2)).Mid(i5, 1) != " ")
-				i5++;
-			while ((m_currentSet_List.GetItemText(6, 2)).Mid(i6, 1) != " ")
-				i6++;
-			kCh0 = (m_currentSet_List.GetItemText(0, 2)).Mid(0, i0);		//将3.5A时候的k解析出来
-			kCh1 = (m_currentSet_List.GetItemText(1, 2)).Mid(0, i1);
-			kCh2 = (m_currentSet_List.GetItemText(2, 2)).Mid(0, i2);
-			kCh3 = (m_currentSet_List.GetItemText(3, 2)).Mid(0, i3);
-			kCh4 = (m_currentSet_List.GetItemText(4, 2)).Mid(0, i4);
-			kCh5 = (m_currentSet_List.GetItemText(5, 2)).Mid(0, i5);
-			kCh6 = (m_currentSet_List.GetItemText(6, 2)).Mid(0, i6);
+				m_currentSet_List.SetItemText(0, 2, AvoidLarge(kCh0) + _T(" -") + AvoidLarge(bCh0));
+				m_currentSet_List.SetItemText(1, 2, AvoidLarge(kCh1) + _T(" -") + AvoidLarge(bCh1));
+				m_currentSet_List.SetItemText(2, 2, AvoidLarge(kCh2) + _T(" -") + AvoidLarge(bCh2));
+				m_currentSet_List.SetItemText(3, 2, AvoidLarge(kCh3) + _T(" -") + AvoidLarge(bCh3));
+				m_currentSet_List.SetItemText(4, 2, AvoidLarge(kCh4) + _T(" -") + AvoidLarge(bCh4));
+				m_currentSet_List.SetItemText(5, 2, AvoidLarge(kCh5) + _T(" -") + AvoidLarge(bCh5));
+				m_currentSet_List.SetItemText(6, 2, AvoidLarge(kCh6) + _T(" -") + AvoidLarge(bCh6));
+			}
+			int wode = 1;
 
-			curCh0.Format(_T("%.4f"), CURRENTVALUE0 / atof(kCh0));					//3.5/k 即得到此时电流值x
-			curCh1.Format(_T("%.4f"), CURRENTVALUE0 / atof(kCh1));
-			curCh2.Format(_T("%.4f"), CURRENTVALUE0 / atof(kCh2));
-			curCh3.Format(_T("%.4f"), CURRENTVALUE0 / atof(kCh3));
-			curCh4.Format(_T("%.4f"), CURRENTVALUE0 / atof(kCh4));
-			curCh5.Format(_T("%.4f"), CURRENTVALUE0 / atof(kCh5));
-			curCh6.Format(_T("%.4f"), CURRENTVALUE0 / atof(kCh6));
+			if (2 == m_cboCurrent.GetCurSel())		//当电流为100A时
+			{
+				CString kCh0, kCh1, kCh2, kCh3, kCh4, kCh5, kCh6;						//3.5A时的k值
+				CString kTCh0, kTCh1, kTCh2, kTCh3, kTCh4, kTCh5, kTCh6;				//100A时的k值
+				CString bTCh0, bTCh1, bTCh2, bTCh3, bTCh4, bTCh5, bTCh6;				//100A时的b值
+				CString curCh0, curCh1, curCh2, curCh3, curCh4, curCh5, curCh6;		//3.5A时电流值
+				int i0 = 0;
+				int i1 = 0;
+				int i2 = 0;
+				int i3 = 0;
+				int i4 = 0;
+				int i5 = 0;
+				int i6 = 0;
+				while ((m_currentSet_List.GetItemText(0, 2)).Mid(i0, 1) != " ")
+					i0++;
+				while ((m_currentSet_List.GetItemText(1, 2)).Mid(i1, 1) != " ")
+					i1++;
+				while ((m_currentSet_List.GetItemText(2, 2)).Mid(i2, 1) != " ")
+					i2++;
+				while ((m_currentSet_List.GetItemText(3, 2)).Mid(i3, 1) != " ")
+					i3++;
+				while ((m_currentSet_List.GetItemText(4, 2)).Mid(i4, 1) != " ")
+					i4++;
+				while ((m_currentSet_List.GetItemText(5, 2)).Mid(i5, 1) != " ")
+					i5++;
+				while ((m_currentSet_List.GetItemText(6, 2)).Mid(i6, 1) != " ")
+					i6++;
+				kCh0 = (m_currentSet_List.GetItemText(0, 2)).Mid(0, i0);		//将3.5A时候的k解析出来
+				kCh1 = (m_currentSet_List.GetItemText(1, 2)).Mid(0, i1);
+				kCh2 = (m_currentSet_List.GetItemText(2, 2)).Mid(0, i2);
+				kCh3 = (m_currentSet_List.GetItemText(3, 2)).Mid(0, i3);
+				kCh4 = (m_currentSet_List.GetItemText(4, 2)).Mid(0, i4);
+				kCh5 = (m_currentSet_List.GetItemText(5, 2)).Mid(0, i5);
+				kCh6 = (m_currentSet_List.GetItemText(6, 2)).Mid(0, i6);
 
-			kTCh0.Format(_T("%.3f"), (CURRENTVALUE1 - CURRENTVALUE0) / (atof(strCh0) - atof(curCh0)));		//求100A时k值 cstring
-			kTCh1.Format(_T("%.3f"), (CURRENTVALUE1 - CURRENTVALUE0) / (atof(strCh1) - atof(curCh1)));
-			kTCh2.Format(_T("%.3f"), (CURRENTVALUE1 - CURRENTVALUE0) / (atof(strCh2) - atof(curCh2)));
-			kTCh3.Format(_T("%.3f"), (CURRENTVALUE1 - CURRENTVALUE0) / (atof(strCh3) - atof(curCh3)));
-			kTCh4.Format(_T("%.3f"), (CURRENTVALUE1 - CURRENTVALUE0) / (atof(strCh4) - atof(curCh4)));
-			kTCh5.Format(_T("%.3f"), (CURRENTVALUE1 - CURRENTVALUE0) / (atof(strCh5) - atof(curCh5)));
-			kTCh6.Format(_T("%.3f"), (CURRENTVALUE1 - CURRENTVALUE0) / (atof(strCh6) - atof(curCh6)));
+				curCh0.Format(_T("%.4f"), CURRENTVALUE0 / atof(kCh0));					//3.5/k 即得到此时电流值x
+				curCh1.Format(_T("%.4f"), CURRENTVALUE0 / atof(kCh1));
+				curCh2.Format(_T("%.4f"), CURRENTVALUE0 / atof(kCh2));
+				curCh3.Format(_T("%.4f"), CURRENTVALUE0 / atof(kCh3));
+				curCh4.Format(_T("%.4f"), CURRENTVALUE0 / atof(kCh4));
+				curCh5.Format(_T("%.4f"), CURRENTVALUE0 / atof(kCh5));
+				curCh6.Format(_T("%.4f"), CURRENTVALUE0 / atof(kCh6));
 
-			bTCh0.Format(_T("%.4f"), (CURRENTVALUE1 - atof(kTCh0) * atof(strCh0)));		//求100A时b值 cstring
-			bTCh1.Format(_T("%.4f"), (CURRENTVALUE1 - atof(kTCh1) * atof(strCh1)));
-			bTCh2.Format(_T("%.4f"), (CURRENTVALUE1 - atof(kTCh2) * atof(strCh2)));
-			bTCh3.Format(_T("%.4f"), (CURRENTVALUE1 - atof(kTCh3) * atof(strCh3)));
-			bTCh4.Format(_T("%.4f"), (CURRENTVALUE1 - atof(kTCh4) * atof(strCh4)));
-			bTCh5.Format(_T("%.4f"), (CURRENTVALUE1 - atof(kTCh5) * atof(strCh5)));
-			bTCh6.Format(_T("%.4f"), (CURRENTVALUE1 - atof(kTCh6) * atof(strCh6)));
+				kTCh0.Format(_T("%.3f"), (CURRENTVALUE1 - CURRENTVALUE0) / (atof(strCh0) - atof(curCh0)));		//求100A时k值 cstring
+				kTCh1.Format(_T("%.3f"), (CURRENTVALUE1 - CURRENTVALUE0) / (atof(strCh1) - atof(curCh1)));
+				kTCh2.Format(_T("%.3f"), (CURRENTVALUE1 - CURRENTVALUE0) / (atof(strCh2) - atof(curCh2)));
+				kTCh3.Format(_T("%.3f"), (CURRENTVALUE1 - CURRENTVALUE0) / (atof(strCh3) - atof(curCh3)));
+				kTCh4.Format(_T("%.3f"), (CURRENTVALUE1 - CURRENTVALUE0) / (atof(strCh4) - atof(curCh4)));
+				kTCh5.Format(_T("%.3f"), (CURRENTVALUE1 - CURRENTVALUE0) / (atof(strCh5) - atof(curCh5)));
+				kTCh6.Format(_T("%.3f"), (CURRENTVALUE1 - CURRENTVALUE0) / (atof(strCh6) - atof(curCh6)));
+
+				bTCh0.Format(_T("%.4f"), (CURRENTVALUE1 - atof(kTCh0) * atof(strCh0)));		//求100A时b值 cstring
+				bTCh1.Format(_T("%.4f"), (CURRENTVALUE1 - atof(kTCh1) * atof(strCh1)));
+				bTCh2.Format(_T("%.4f"), (CURRENTVALUE1 - atof(kTCh2) * atof(strCh2)));
+				bTCh3.Format(_T("%.4f"), (CURRENTVALUE1 - atof(kTCh3) * atof(strCh3)));
+				bTCh4.Format(_T("%.4f"), (CURRENTVALUE1 - atof(kTCh4) * atof(strCh4)));
+				bTCh5.Format(_T("%.4f"), (CURRENTVALUE1 - atof(kTCh5) * atof(strCh5)));
+				bTCh6.Format(_T("%.4f"), (CURRENTVALUE1 - atof(kTCh6) * atof(strCh6)));
 
 
-			m_currentSet_List.SetItemText(0, 3, AvoidLarge(kTCh0) + _T(" ") + AvoidLarge(bTCh0));
-			m_currentSet_List.SetItemText(1, 3, AvoidLarge(kTCh1) + _T(" ") + AvoidLarge(bTCh1));
-			m_currentSet_List.SetItemText(2, 3, AvoidLarge(kTCh2) + _T(" ") + AvoidLarge(bTCh2));
-			m_currentSet_List.SetItemText(3, 3, AvoidLarge(kTCh3) + _T(" ") + AvoidLarge(bTCh3));
-			m_currentSet_List.SetItemText(4, 3, AvoidLarge(kTCh4) + _T(" ") + AvoidLarge(bTCh4));
-			m_currentSet_List.SetItemText(5, 3, AvoidLarge(kTCh5) + _T(" ") + AvoidLarge(bTCh5));
-			m_currentSet_List.SetItemText(6, 3, AvoidLarge(kTCh6) + _T(" ") + AvoidLarge(bTCh6));
+				m_currentSet_List.SetItemText(0, 3, AvoidLarge(kTCh0) + _T(" ") + AvoidLarge(bTCh0));
+				m_currentSet_List.SetItemText(1, 3, AvoidLarge(kTCh1) + _T(" ") + AvoidLarge(bTCh1));
+				m_currentSet_List.SetItemText(2, 3, AvoidLarge(kTCh2) + _T(" ") + AvoidLarge(bTCh2));
+				m_currentSet_List.SetItemText(3, 3, AvoidLarge(kTCh3) + _T(" ") + AvoidLarge(bTCh3));
+				m_currentSet_List.SetItemText(4, 3, AvoidLarge(kTCh4) + _T(" ") + AvoidLarge(bTCh4));
+				m_currentSet_List.SetItemText(5, 3, AvoidLarge(kTCh5) + _T(" ") + AvoidLarge(bTCh5));
+				m_currentSet_List.SetItemText(6, 3, AvoidLarge(kTCh6) + _T(" ") + AvoidLarge(bTCh6));
+			}
 		}
 	}
 }
@@ -2557,6 +2588,7 @@ void CToolDlg::OnEnChangeEditport()
 void CToolDlg::OnBnClickedOpenchildframe()
 {
 	// TODO: 在此添加控件通知处理程序代码
+	::SendMessage(m_ChildFrame->GetSafeHwnd(), WM_CHILDMESSAGE, WPARAM(m_Connected), 0);
 
 	if (!GetDlgItem(IDC_STATIC_ChildArea)->IsWindowVisible())
 	{
@@ -2565,10 +2597,10 @@ void CToolDlg::OnBnClickedOpenchildframe()
 
 		m_currentSet_List.ShowWindow(SW_HIDE);		//通过隐藏其他控件
 		GetDlgItem(IDC_BUTTON1)->ShowWindow(SW_HIDE);
-		GetDlgItem(IDC_BTN_CLEAR_RECEIVE)->ShowWindow(SW_HIDE);
 		GetDlgItem(IDC_COMBO2)->ShowWindow(SW_HIDE);
 		GetDlgItem(IDC_BUTTON_Cal)->ShowWindow(SW_HIDE);
 		GetDlgItem(IDC_BUTTON_SET)->ShowWindow(SW_HIDE);
+		GetDlgItem(AutoDefaultBtn)->ShowWindow(SW_HIDE);
 		GetDlgItem(IDC_CHECK1)->ShowWindow(SW_HIDE);
 		GetDlgItem(IDC_CHECK2)->ShowWindow(SW_HIDE);
 		GetDlgItem(IDC_CHECK3)->ShowWindow(SW_HIDE);
@@ -2587,10 +2619,10 @@ void CToolDlg::OnBnClickedOpenchildframe()
 
 		m_currentSet_List.ShowWindow(SW_SHOW);		//通过隐藏其他控件
 		GetDlgItem(IDC_BUTTON1)->ShowWindow(SW_SHOW);
-		GetDlgItem(IDC_BTN_CLEAR_RECEIVE)->ShowWindow(SW_SHOW);
 		GetDlgItem(IDC_COMBO2)->ShowWindow(SW_SHOW);
 		GetDlgItem(IDC_BUTTON_Cal)->ShowWindow(SW_SHOW);
 		GetDlgItem(IDC_BUTTON_SET)->ShowWindow(SW_SHOW);
+		GetDlgItem(AutoDefaultBtn)->ShowWindow(SW_SHOW);
 		GetDlgItem(IDC_CHECK1)->ShowWindow(SW_SHOW);
 		GetDlgItem(IDC_CHECK2)->ShowWindow(SW_SHOW);
 		GetDlgItem(IDC_CHECK3)->ShowWindow(SW_SHOW);
@@ -2654,4 +2686,60 @@ void CToolDlg::OnNMClickListCurrent(NMHDR* pNMHDR, LRESULT* pResult)
 	m_CurrentEdit.ShowWindow(SW_HIDE); //隐藏编辑框
 
 	*pResult = 0;
+}
+
+
+BOOL CToolDlg::ReadWndPosition()
+{
+	WINDOWPLACEMENT wp;
+	CFile file;
+	if (!file.Open(_T("wodema.position"), CFile::modeRead))
+		return FALSE;
+	UINT nByteRead = file.Read(&wp, sizeof(wp));
+	if (sizeof(wp) != nByteRead)
+		return FALSE;
+	if(!::SetWindowPlacement(this->GetSafeHwnd(), &wp))
+		return FALSE;
+	file.Close();
+	return TRUE;
+}
+
+BOOL CToolDlg::WriteWndPosition()
+{
+	WINDOWPLACEMENT wp = { sizeof(wp) };
+	::GetWindowPlacement(this->GetSafeHwnd(), &wp);
+	CFile file;
+	if (!file.Open(_T("wodema.position"), CFile::modeCreate | CFile::modeWrite))
+		return FALSE;
+	file.Write(&wp, sizeof(wp));
+	file.Close();
+	return TRUE;
+}
+
+BOOL CToolDlg::DestroyWindow()
+{
+	// TODO: 在此添加专用代码和/或调用基类
+	CString baudrateStr, Ip1,Ip2,Ip3,Ip4,portStr;
+	GetDlgItem(IDC_CBO_BAUD_RATE)->GetWindowTextA(baudrateStr);
+	GetDlgItem(EditIP1)->GetWindowTextA(Ip1);
+	GetDlgItem(EditIp2)->GetWindowTextA(Ip2);	
+	GetDlgItem(EditIP3)->GetWindowTextA(Ip3);	
+	GetDlgItem(EditIP4)->GetWindowTextA(Ip4);
+	GetDlgItem(IDC_EDIT_Port)->GetWindowTextA(portStr);
+
+	//将值写入ini文件
+	::WritePrivateProfileString("IDC_CBO_BAUD_RATE", "BundRate", baudrateStr, ".\\Defalut.ini");
+	::WritePrivateProfileString("IpAddress", "IP", _T(Ip1+"."+Ip2+"."+Ip3+"."+Ip4), ".\\Defalut.ini");
+	::WritePrivateProfileString("Port", "port", _T(portStr), ".\\Defalut.ini");
+
+	WriteWndPosition();
+
+	return CDialog::DestroyWindow();
+}
+
+
+afx_msg LRESULT CToolDlg::OnTochildMessage(WPARAM wParam, LPARAM lParam)
+{
+
+	return 0;
 }

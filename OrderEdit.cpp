@@ -219,3 +219,52 @@ void COrderEdit::OnBnClickedButton20()
 	::SendMessage(this->GetParent()->m_hWnd, WM_ORDERMESSAGE, WPARAM(TRUE) ,(LPARAM)(LPCTSTR)str);
 	str.ReleaseBuffer();
 }
+
+BOOL COrderEdit::ReadWndPosition()
+{
+	WINDOWPLACEMENT wp;
+	CFile file;
+	if (!file.Open(_T("1234.position"), CFile::modeRead))
+		return FALSE;
+	UINT nByteRead = file.Read(&wp, sizeof(wp));
+	if (sizeof(wp) != nByteRead)
+		return FALSE;
+	if(!::SetWindowPlacement(this->GetSafeHwnd(), &wp))
+		return FALSE;
+	file.Close();
+	return TRUE;
+}
+
+BOOL COrderEdit::WriteWndPosition()
+{
+	WINDOWPLACEMENT wp = { sizeof(wp) };
+	::GetWindowPlacement(this->GetSafeHwnd(), &wp);
+	CFile file;
+	if (!file.Open(_T("1234.position"), CFile::modeCreate | CFile::modeWrite))
+		return FALSE;
+	file.Write(&wp, sizeof(wp));
+	file.Close();
+	return TRUE;
+}
+
+BOOL COrderEdit::OnInitDialog()
+{
+	CDialogEx::OnInitDialog();
+
+	// TODO:  在此添加额外的初始化
+
+	ReadWndPosition();
+
+	return TRUE;  // return TRUE unless you set the focus to a control
+	// 异常: OCX 属性页应返回 FALSE
+}
+
+
+BOOL COrderEdit::DestroyWindow()
+{
+	// TODO: 在此添加专用代码和/或调用基类
+
+	WriteWndPosition();
+
+	return CDialogEx::DestroyWindow();
+}

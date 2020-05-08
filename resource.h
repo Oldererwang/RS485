@@ -93,7 +93,10 @@
 #define SendOrderBtn                    1098
 #define AutoDefaultBtn                  1099
 #define IDC_RICHEDIT21                  1100
-#define IDC_TAB1                        1101
+#define DefalutBtn                      1102
+#define IDC_SPIN1                       1104
+#define SetTimeSendBtn                  1106
+#define TimeEdit                        1107
 
 // Next default values for new objects
 // 
@@ -101,7 +104,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        135
 #define _APS_NEXT_COMMAND_VALUE         32771
-#define _APS_NEXT_CONTROL_VALUE         1102
+#define _APS_NEXT_CONTROL_VALUE         1108
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

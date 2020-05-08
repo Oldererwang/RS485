@@ -14,6 +14,7 @@ IMPLEMENT_DYNAMIC(CChildFrame, CDialogEx)
 CChildFrame::CChildFrame(CWnd* pParent /*=NULL*/)
 	: CDialogEx(CChildFrame::IDD, pParent)
 {
+	m_Connected = 0;
 }
 
 CChildFrame::~CChildFrame()
@@ -32,6 +33,12 @@ BEGIN_MESSAGE_MAP(CChildFrame, CDialogEx)
 	ON_BN_CLICKED(SendOrderBtn, &CChildFrame::OnBnClickedSendorderbtn)
 	ON_STN_CLICKED(IDC_MFCPROPERTYGRID_ORDER, &CChildFrame::OnStnClickedMfcpropertygridOrder)
 
+	ON_WM_DESTROY()
+	ON_WM_NCDESTROY()
+	ON_BN_CLICKED(SetTimeSendBtn, &CChildFrame::OnBnClickedSettimesendbtn)
+	ON_WM_TIMER()
+	ON_BN_CLICKED(DefalutBtn, &CChildFrame::OnBnClickedDefalutbtn)
+	ON_MESSAGE(WM_CHILDMESSAGE, &CChildFrame::OnChildmessage)
 END_MESSAGE_MAP()
 
 
@@ -41,78 +48,79 @@ END_MESSAGE_MAP()
 
 void CChildFrame::OnBnClickedSendorderbtn()		//发送格式指令
 {
-	if (m_propertyGrid.GetProperty(6)->GetValue() != CString(_T("")))
+	if (m_Connected)
 	{
-		CString str1, str2, str3, str4, str5, str6, strCstr;
-		str1 = m_propertyGrid.GetProperty(0)->GetValue();
-		str2 = m_propertyGrid.GetProperty(2)->GetValue();
-		str3 = m_propertyGrid.GetProperty(3)->GetValue();
-		str4 = m_propertyGrid.GetProperty(4)->GetValue();
-		str5 = m_propertyGrid.GetProperty(5)->GetValue();
-		str6 = m_propertyGrid.GetProperty(6)->GetValue();
-
-		char strChar[18] = { 0 };
-		str2hex(str2, strChar);
-		strCstr.Format("%s", strChar);
-		BYTE orderData[32] = { 0 };
-
-		if ("0xC00055AA" == str1)
+		if (m_propertyGrid.GetProperty(0)->GetValue() != CString(_T("请选择指令")))
 		{
-			CString strDate = _T("AA5500C014000000") + strCstr + str3 + str4 + str5 + str6;
-			for (int i = 2; i < strDate.GetLength(); i += 3)
-			{
-				strDate.Insert(i, _T(" "));
-			}
-			int wode = HexStrToHex(strDate, orderData);
+			CString str1, str2, str3, str4, str5, str6, strCstr;
+			str1 = m_propertyGrid.GetProperty(0)->GetValue();
+			str2 = m_propertyGrid.GetProperty(2)->GetValue();
+			str3 = m_propertyGrid.GetProperty(3)->GetValue();
+			str4 = m_propertyGrid.GetProperty(4)->GetValue();
+			str5 = m_propertyGrid.GetProperty(5)->GetValue();
+			str6 = m_propertyGrid.GetProperty(6)->GetValue();
 
-			::SendMessage(this->GetParent()->m_hWnd, WM_BYTEMESSAGE, WPARAM(wode), (LPARAM)orderData);
-		}
+			char strChar[18] = { 0 };
+			str2hex(str2, strChar);
+			strCstr.Format("%s", strChar);
+			BYTE orderData[32] = { 0 };
 
-		if ("0xC10055AA" == str1)
-		{
-			CString strDate = _T("AA5500C114000000") + strCstr + str3 + str4 + str5 + str6;
-			for (int i = 2; i < strDate.GetLength(); i += 3)
+			if ("0xC00055AA" == str1)
 			{
-				strDate.Insert(i, _T(" "));
-			}
-			int wode = HexStrToHex(strDate, orderData);
-			::SendMessage(this->GetParent()->m_hWnd, WM_BYTEMESSAGE, WPARAM(wode), (LPARAM)(LPCTSTR)orderData);
-		}
+				CString strDate = _T("AA5500C014000000") + strCstr + str3 + str4 + str5 + str6;
+				for (int i = 2; i < strDate.GetLength(); i += 3)
+				{
+					strDate.Insert(i, _T(" "));
+				}
+				int wode = HexStrToHex(strDate, orderData);
 
-		if ("0xC20055AA" == str1)
-		{
-			CString strDate = _T("AA5500C214000000") + strCstr + str3 + str4 + str5 + str6;
-			for (int i = 2; i < strDate.GetLength(); i += 3)
-			{
-				strDate.Insert(i, _T(" "));
+				::SendMessage(this->GetParent()->m_hWnd, WM_BYTEMESSAGE, WPARAM(wode), (LPARAM)orderData);
 			}
-			int wode = HexStrToHex(strDate, orderData);
-			::SendMessage(this->GetParent()->m_hWnd, WM_BYTEMESSAGE, WPARAM(wode), (LPARAM)(LPCTSTR)orderData);
-		}
 
-		if ("0xC30055AA" == str1)
-		{
-			CString strDate = _T("AA5500C314000000") + strCstr + str3 + str4 + str5 + str6;
-			for (int i = 2; i < strDate.GetLength(); i += 3)
+			if ("0xC10055AA" == str1)
 			{
-				strDate.Insert(i, _T(" "));
+				CString strDate = _T("AA5500C114000000") + strCstr + str3 + str4 + str5 + str6;
+				for (int i = 2; i < strDate.GetLength(); i += 3)
+				{
+					strDate.Insert(i, _T(" "));
+				}
+				int wode = HexStrToHex(strDate, orderData);
+				::SendMessage(this->GetParent()->m_hWnd, WM_BYTEMESSAGE, WPARAM(wode), (LPARAM)(LPCTSTR)orderData);
 			}
-			int wode = HexStrToHex(strDate, orderData);
-			::SendMessage(this->GetParent()->m_hWnd, WM_BYTEMESSAGE, WPARAM(wode), (LPARAM)(LPCTSTR)orderData);
-		}
-		if ("0xC40055AA" == str1)
-		{
-			CString strDate = _T("AA5500C414000000") + strCstr + str3 + str4 + str5 + str6;
-			for (int i = 2; i < strDate.GetLength(); i += 3)
+
+			if ("0xC20055AA" == str1)
 			{
-				strDate.Insert(i, _T(" "));
+				CString strDate = _T("AA5500C214000000") + strCstr + str3 + str4 + str5 + str6;
+				for (int i = 2; i < strDate.GetLength(); i += 3)
+				{
+					strDate.Insert(i, _T(" "));
+				}
+				int wode = HexStrToHex(strDate, orderData);
+				::SendMessage(this->GetParent()->m_hWnd, WM_BYTEMESSAGE, WPARAM(wode), (LPARAM)(LPCTSTR)orderData);
 			}
-			int wode = HexStrToHex(strDate, orderData);
-			::SendMessage(this->GetParent()->m_hWnd, WM_BYTEMESSAGE, WPARAM(wode), (LPARAM)(LPCTSTR)orderData);
+
+			if ("0xC30055AA" == str1)
+			{
+				CString strDate = _T("AA5500C314000000") + strCstr + str3 + str4 + str5 + str6;
+				for (int i = 2; i < strDate.GetLength(); i += 3)
+				{
+					strDate.Insert(i, _T(" "));
+				}
+				int wode = HexStrToHex(strDate, orderData);
+				::SendMessage(this->GetParent()->m_hWnd, WM_BYTEMESSAGE, WPARAM(wode), (LPARAM)(LPCTSTR)orderData);
+			}
+			if ("0xC40055AA" == str1)
+			{
+				CString strDate = _T("AA5500C414000000") + strCstr + str3 + str4 + str5 + str6;
+				for (int i = 2; i < strDate.GetLength(); i += 3)
+				{
+					strDate.Insert(i, _T(" "));
+				}
+				int wode = HexStrToHex(strDate, orderData);
+				::SendMessage(this->GetParent()->m_hWnd, WM_BYTEMESSAGE, WPARAM(wode), (LPARAM)(LPCTSTR)orderData);
+			}
 		}
 	}
-
-
 
 	//将命令框中的命令字符串形式发送出去
 	//::SendMessage(this->GetParent()->m_hWnd, WM_ORDERMESSAGE, WPARAM(TRUE) ,(LPARAM)(LPCTSTR)str);
@@ -127,9 +135,22 @@ BOOL CChildFrame::OnInitDialog()
 	CDialogEx::OnInitDialog();
 
 	// TODO:  在此添加额外的初始化
+
+	//设置字体
 	m_editFont.CreatePointFont(140, _T("Times New Roman"));
 	m_propertyGrid.SetFont(&m_editFont);
 	m_propertyGrid.SetFont(&m_editFont);
+
+
+	CSpinButtonCtrl* pSpin = (CSpinButtonCtrl*)GetDlgItem(IDC_SPIN1);
+	pSpin->SetRange32(0, 5000);  //设置值的范围：0-5000
+	pSpin->SetBase(10);       //设置基数：十进制
+
+	CString timeStr;
+	::GetPrivateProfileString("TimeSet", "time", "1000",timeStr.GetBuffer(10),10, ".\\Defalut.ini");
+	timeStr.ReleaseBuffer();
+	SetDlgItemText(TimeEdit,_T(timeStr));
+
 
 	return TRUE;  // return TRUE unless you set the focus to a control
 	// 异常: OCX 属性页应返回 FALSE
@@ -260,3 +281,64 @@ int CChildFrame::HexChar(char c)
 		return 0x10;
 }
 
+
+void CChildFrame::OnBnClickedSettimesendbtn()
+{
+	// TODO: 在此添加控件通知处理程序代码
+	if (m_Connected)
+	{
+		CString timeStr;
+		GetDlgItem(TimeEdit)->GetWindowText(timeStr);
+		::WritePrivateProfileString("TimeSet", "time", _T(timeStr), ".\\Defalut.ini");
+
+		CString btnStr;
+		GetDlgItem(SetTimeSendBtn)->GetWindowTextA(btnStr);
+		if ("定时发送" == btnStr)
+		{
+			GetDlgItem(SetTimeSendBtn)->SetWindowTextA("停止发送");
+			int timeInt = _ttoi(timeStr);
+			SetTimer(1, timeInt, 0);
+		}
+		else
+		{
+			GetDlgItem(SetTimeSendBtn)->SetWindowTextA("定时发送");
+			KillTimer(1);
+		}
+	}
+}
+
+
+void CChildFrame::OnTimer(UINT_PTR nIDEvent)
+{
+	// TODO: 在此添加消息处理程序代码和/或调用默认值
+
+	CDialogEx::OnTimer(nIDEvent);
+
+	switch (nIDEvent)
+	{
+	case 1:
+		OnBnClickedSendorderbtn();	//调用发送按钮
+		break;
+	}
+}
+
+void CChildFrame::OnBnClickedDefalutbtn()
+{
+	// TODO: 在此添加控件通知处理程序代码
+
+	CMFCPropertyGridProperty* pProp;
+	m_propertyGrid.GetProperty(0)->SetValue("0xC00055AA");
+	m_propertyGrid.GetProperty(2)->SetValue("ZTZN0001");
+	m_propertyGrid.GetProperty(3)->SetValue("00000000");
+	m_propertyGrid.GetProperty(4)->SetValue("00000000");
+	m_propertyGrid.GetProperty(5)->SetValue("00000000");
+	m_propertyGrid.GetProperty(6)->SetValue("");
+
+}
+
+
+afx_msg LRESULT CChildFrame::OnChildmessage(WPARAM wParam, LPARAM lParam)
+{
+	m_Connected = (bool)(WPARAM)wParam;
+	return 0;
+}

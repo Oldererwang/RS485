@@ -38,9 +38,13 @@ protected:
 	afx_msg void OnBnClickedButton20();
 
 	DECLARE_MESSAGE_MAP()
+	BOOL ReadWndPosition();
+	BOOL WriteWndPosition();
 public:
 
 	CEdit m_Orderedit1;
 	CString m_strOrderEdit1;
 
+	virtual BOOL OnInitDialog();
+	virtual BOOL DestroyWindow();
 };
