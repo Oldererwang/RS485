@@ -287,22 +287,25 @@ void CChildFrame::OnBnClickedSettimesendbtn()
 	// TODO: 在此添加控件通知处理程序代码
 	if (m_Connected)
 	{
-		CString timeStr;
-		GetDlgItem(TimeEdit)->GetWindowText(timeStr);
-		::WritePrivateProfileString("TimeSet", "time", _T(timeStr), ".\\Defalut.ini");
+		if (m_propertyGrid.GetProperty(0)->GetValue() != CString(_T("请选择指令")))
+		{
+			CString timeStr;
+			GetDlgItem(TimeEdit)->GetWindowText(timeStr);
+			::WritePrivateProfileString("TimeSet", "time", _T(timeStr), ".\\Defalut.ini");
 
-		CString btnStr;
-		GetDlgItem(SetTimeSendBtn)->GetWindowTextA(btnStr);
-		if ("定时发送" == btnStr)
-		{
-			GetDlgItem(SetTimeSendBtn)->SetWindowTextA("停止发送");
-			int timeInt = _ttoi(timeStr);
-			SetTimer(1, timeInt, 0);
-		}
-		else
-		{
-			GetDlgItem(SetTimeSendBtn)->SetWindowTextA("定时发送");
-			KillTimer(1);
+			CString btnStr;
+			GetDlgItem(SetTimeSendBtn)->GetWindowTextA(btnStr);
+			if ("定时发送" == btnStr)
+			{
+				GetDlgItem(SetTimeSendBtn)->SetWindowTextA("停止发送");
+				int timeInt = _ttoi(timeStr);
+				SetTimer(1, timeInt, 0);
+			}
+			else
+			{
+				GetDlgItem(SetTimeSendBtn)->SetWindowTextA("定时发送");
+				KillTimer(1);
+			}
 		}
 	}
 }

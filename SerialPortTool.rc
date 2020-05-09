@@ -70,6 +70,7 @@ END
 // remains consistent on all systems.
 IDR_MAINFRAME           ICON                    "res\\SerialPortTool.ico"
 
+
 /////////////////////////////////////////////////////////////////////////////
 //
 // Dialog
@@ -85,7 +86,7 @@ BEGIN
     COMBOBOX        IDC_CBO_BAUD_RATE,53,2,47,82,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     COMBOBOX        IDC_CBO_SERIAL_PORT,3,2,47,82,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     CONTROL         "",IDC_LIST2,"SysListView32",LVS_REPORT | LVS_ALIGNLEFT | LVS_NOSCROLL | WS_BORDER | WS_TABSTOP,293,60,270,124
-    CONTROL         "",IDC_LIST3,"SysListView32",LVS_REPORT | LVS_ALIGNLEFT | LVS_NOSCROLL | WS_BORDER | WS_TABSTOP,293,17,270,37
+    CONTROL         "",IDC_LIST3,"SysListView32",LVS_REPORT | LVS_ALIGNLEFT | LVS_NOSCROLL | WS_BORDER | WS_TABSTOP,293,17,270,35
     CONTROL         "",IDC_LIST4,"SysListView32",LVS_REPORT | LVS_EDITLABELS | LVS_ALIGNLEFT | LVS_NOSCROLL | WS_BORDER | WS_TABSTOP,293,192,262,120
     PUSHBUTTON      "系数计算",IDC_BUTTON_Cal,456,319,53,14
     PUSHBUTTON      "通道校准",IDC_BUTTON_SET,510,319,53,14
@@ -179,9 +180,9 @@ CAPTION "关于电流校准软件"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     DEFPUSHBUTTON   "确定",IDOK,160,54,50,14
-    LTEXT           "电流校准软件，版本1.0",IDC_STATIC,76,18,89,11
-    LTEXT           "版权所有（C）WHZT，2020",IDC_STATIC,75,32,97,8
-    ICON            IDR_MAINFRAME,IDC_STATIC,39,20,21,20
+    LTEXT           "电流校准软件，版本1.0",IDC_STATIC,75,17,89,11
+    LTEXT           "版权所有（C）WHZT，2020",IDC_STATIC,74,31,97,8
+    ICON            IDR_MAINFRAME,IDC_STATIC,38,19,21,20
 END
 
 
@@ -208,6 +209,7 @@ BEGIN
         BLOCK "080403a8"
         BEGIN
             VALUE "CompanyName", "Whzt"
+            VALUE "FileDescription", "Olderwang"
             VALUE "FileVersion", "1.0.0.1"
             VALUE "InternalName", "SerialPortTool.exe"
             VALUE "OriginalFilename", "SerialPortTool.exe"
@@ -295,22 +297,22 @@ END
 
 /////////////////////////////////////////////////////////////////////////////
 //
-// 32766
+// AFX_DIALOG_LAYOUT
 //
 
-IDD_SERIALPORTTOOL_DIALOG 32766
+IDD_SERIALPORTTOOL_DIALOG AFX_DIALOG_LAYOUT
 BEGIN
-    0x0000
+    0
 END
 
-IDD_DIALOG1 32766
+IDD_DIALOG1 AFX_DIALOG_LAYOUT
 BEGIN
-    0x0000
+    0
 END
 
-IDD_AboutDlg 32766
+IDD_AboutDlg AFX_DIALOG_LAYOUT
 BEGIN
-    0x0000
+    0
 END
 
 

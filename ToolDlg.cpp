@@ -31,7 +31,6 @@ CToolDlg::CToolDlg(CWnd* pParent /*=NULL*/)
 	, m_StrRichEdit(_T(""))
 {
 	//初始化
-	m_CurrentEdit.ShowWindow(SW_HIDE);
 	m_StrSendData = _T("");
 	m_StrRichEdit = _T("");
 	m_bHexReceive = FALSE;
@@ -320,7 +319,7 @@ BOOL CToolDlg::OnInitDialog()
 	/*这一部分是创建命令子窗口并隐藏*/
 	orderEditDlg = new COrderEdit;
 	orderEditDlg->Create(IDD_EDIT_DIALOG, this);
-	orderEditDlg->SetWindowPos(&CWnd::wndTop, (rt1.right + 30), rt3.top + 10, 0, 0, SWP_NOSIZE);	//设置子窗口位置
+	orderEditDlg->SetWindowPos(&CWnd::wndTop, (rt1.right), rt3.top + 10, 0, 0, SWP_NOSIZE);	//设置子窗口位置
 
 	//编辑框指定文本
 	orderEditDlg->SetDlgItemText(IDC_EDIT1, ">DEVICE_ID:ZTZN0001");
@@ -345,6 +344,7 @@ BOOL CToolDlg::OnInitDialog()
 	//orderEditDlg->SetDlgItemText(IDC_EDIT20,"");
 
 	orderEditDlg->ShowWindow(SW_HIDE);
+	m_CurrentEdit.ShowWindow(SW_HIDE);
 
 	CRect rect1;
 	m_ListCurrent.GetClientRect(&rect1);			// 获取m_ListCurrent的位置和大小   
