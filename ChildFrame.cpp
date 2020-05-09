@@ -317,7 +317,15 @@ void CChildFrame::OnTimer(UINT_PTR nIDEvent)
 	switch (nIDEvent)
 	{
 	case 1:
-		OnBnClickedSendorderbtn();	//调用发送按钮
+		if (m_Connected)
+		{
+			OnBnClickedSendorderbtn();	//调用发送按钮
+		}
+		else
+		{
+			GetDlgItem(SetTimeSendBtn)->SetWindowTextA("定时发送");
+			KillTimer(1);
+		}
 		break;
 	}
 }

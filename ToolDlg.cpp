@@ -6,6 +6,7 @@
 #include "ToolDlg.h"
 #include "OrderEdit.h"
 #include "ChildFrame.h"
+#include "AboutDlg.h"
 #include <Dbt.h>
 
 
@@ -96,20 +97,16 @@ BEGIN_MESSAGE_MAP(CToolDlg, CDialog)
 	ON_WM_QUERYDRAGICON()
 	//}}AFX_MSG_MAP
 	ON_BN_CLICKED(IDC_BTN_OPEN_CLOSE_PORT, &CToolDlg::OnBnClickedBtnOpenPort)
-
-	ON_BN_CLICKED(IDC_BTN_CLEAR_RECEIVE, &CToolDlg::OnBnClickedBtnClearReceive)
 	ON_BN_CLICKED(IDC_CHK_HEX_SEND, &CToolDlg::OnBnClickedChkHexSend)
 	ON_WM_DEVICECHANGE()
 	ON_WM_TIMER()
 	ON_MESSAGE(WM_COMM_RXCHAR, &CToolDlg::OnComm)
-	ON_BN_CLICKED(IDC_SendOrder_BUTTON1, &CToolDlg::OnBnClickedSendorderButton1)
 	ON_BN_CLICKED(IDC_BUTTON_Cal, &CToolDlg::OnBnClickedButtonCal)
 	ON_BN_CLICKED(IDC_BUTTON_SET, &CToolDlg::OnBnClickedButtonSet)
 	ON_MESSAGE(WM_ORDERMESSAGE, &CToolDlg::OrderMessage)
 	ON_MESSAGE(WM_BYTEMESSAGE, &CToolDlg::ByteMessage)
 	ON_BN_CLICKED(IDC_BUTTON1, &CToolDlg::OnBnClickedDefault)
 	ON_BN_CLICKED(IDC_BUTTON2, &CToolDlg::OnBnClickedButton2)
-	ON_BN_CLICKED(IDC_BUTTON3, &CToolDlg::OnBnClickedButton3)
 	ON_BN_CLICKED(IDC_CHECK1, &CToolDlg::OnBnClickedCheck1)
 	ON_BN_CLICKED(IDC_CHECK2, &CToolDlg::OnBnClickedCheck2)
 	ON_BN_CLICKED(IDC_CHECK3, &CToolDlg::OnBnClickedCheck3)
@@ -117,8 +114,6 @@ BEGIN_MESSAGE_MAP(CToolDlg, CDialog)
 	ON_BN_CLICKED(IDC_CHECK5, &CToolDlg::OnBnClickedCheck5)
 	ON_BN_CLICKED(IDC_CHECK6, &CToolDlg::OnBnClickedCheck6)
 	ON_BN_CLICKED(IDC_CHECK7, &CToolDlg::OnBnClickedCheck7)
-	ON_BN_CLICKED(IDC_BUTTON_SAVE, &CToolDlg::OnBnClickedButtonSave)
-	ON_BN_CLICKED(showStateBtn, &CToolDlg::OnBnClickedshowstatebtn)
 	ON_EN_CHANGE(EditIP1, &CToolDlg::OnEnChangeEditip1)
 	ON_EN_CHANGE(EditIp2, &CToolDlg::OnEnChangeEditip2)
 	ON_EN_CHANGE(EditIP3, &CToolDlg::OnEnChangeEditip3)
@@ -126,14 +121,21 @@ BEGIN_MESSAGE_MAP(CToolDlg, CDialog)
 	ON_BN_CLICKED(setIpBtn, &CToolDlg::OnBnClickedsetipbtn)
 	ON_BN_CLICKED(setPortBtn, &CToolDlg::OnBnClickedsetportbtn)
 	ON_EN_CHANGE(IDC_EDITPort, &CToolDlg::OnEnChangeEditport)
-
-	ON_BN_CLICKED(OpenChildFrame, &CToolDlg::OnBnClickedOpenchildframe)
 	ON_NOTIFY(NM_DBLCLK, IDC_LIST4, &CToolDlg::OnNMDblclkList4)
-	ON_BN_CLICKED(AutoDefaultBtn, &CToolDlg::OnBnClickedAutodefaultbtn)
 	ON_NOTIFY(NM_CLICK, IDC_LIST4, &CToolDlg::OnNMClickListCurrent)
 
 	ON_WM_DESTROY()
 
+	ON_COMMAND(ID_32772, &CToolDlg::On32772)
+	ON_COMMAND(ID_32776, &CToolDlg::OnMenuCOrder)
+	ON_COMMAND(ID_32777, &CToolDlg::OnMenuBOrder)
+	ON_COMMAND(ID_32774, &CToolDlg::OnTimeSet)
+	ON_COMMAND(ID_32775, &CToolDlg::OnMenuShowState)
+	ON_COMMAND(4, &CToolDlg::OnMenuOrder)
+	ON_COMMAND(ID_32778, &CToolDlg::OnMenuSetDefault)
+	ON_COMMAND(ID_32779, &CToolDlg::OnMenuSaveCache)
+	ON_COMMAND(ID_32780, &CToolDlg::OnMenuClearReceive)
+	ON_COMMAND(ID_32773, &CToolDlg::OnMenuAboutDlg)
 END_MESSAGE_MAP()
 
 
@@ -147,6 +149,11 @@ BOOL CToolDlg::OnInitDialog()
 	//  执行此操作
 	SetIcon(m_hIcon, TRUE);			// 设置大图标
 	SetIcon(m_hIcon, FALSE);		// 设置小图标
+
+	/*这一部分是menu菜单*/
+	CMenu* pMenu = new CMenu;
+	pMenu->LoadMenu(IDR_MENU1); //载入菜单资源
+	SetMenu(pMenu);
 
 	ReadWndPosition();		//载入窗口位置
 
@@ -221,7 +228,7 @@ BOOL CToolDlg::OnInitDialog()
 	font1.Detach();
 	font2.Detach();
 	font3.Detach();
-
+	
 	/*这一部分是TAB窗口*/
 	//m_tab.InsertItem(0,_T("第一页"));  
 	////m_Tab.InsertItem(1,_T(“第二页”));
@@ -303,7 +310,7 @@ BOOL CToolDlg::OnInitDialog()
 	this->GetWindowRect(&rt1);
 
 	CRect rt2;
-	GetDlgItem(IDC_BUTTON3)->GetWindowRect(&rt2);
+	GetDlgItem(setIpBtn)->GetWindowRect(&rt2);
 
 	//找到m_ListCurrent相对窗口左上角位置r2
 	CRect rt3;
@@ -388,13 +395,13 @@ BOOL CToolDlg::OnInitDialog()
 	m_ListCurrent.InsertItem(5, _T("通道6:"));
 	m_ListCurrent.InsertItem(6, _T("通道7:"));
 
-	m_ListCurrent.SetItemText(0, 1, _T("A相接地电流"));
-	m_ListCurrent.SetItemText(1, 1, _T("B相接地电流"));
-	m_ListCurrent.SetItemText(2, 1, _T("C相接地电流"));
-	m_ListCurrent.SetItemText(3, 1, _T(" 总接地电流"));
-	m_ListCurrent.SetItemText(4, 1, _T("A相运行电流"));
-	m_ListCurrent.SetItemText(5, 1, _T("B相运行电流"));
-	m_ListCurrent.SetItemText(6, 1, _T("C相运行电流"));
+	//m_ListCurrent.SetItemText(0, 1, _T("A相接地电流"));
+	//m_ListCurrent.SetItemText(1, 1, _T("B相接地电流"));
+	//m_ListCurrent.SetItemText(2, 1, _T("C相接地电流"));
+	//m_ListCurrent.SetItemText(3, 1, _T(" 总接地电流"));
+	//m_ListCurrent.SetItemText(4, 1, _T("A相运行电流"));
+	//m_ListCurrent.SetItemText(5, 1, _T("B相运行电流"));
+	//m_ListCurrent.SetItemText(6, 1, _T("C相运行电流"));
 	m_btnOpenClosePort.SetWindowText(_T("打开串口"));
 
 	if (m_bHexReceive)
@@ -525,16 +532,6 @@ HCURSOR CToolDlg::OnQueryDragIcon()
 	return static_cast<HCURSOR>(m_hIcon);
 }
 
-
-void CToolDlg::OnBnClickedBtnClearReceive()
-{
-	// TODO: 在此添加控件通知处理程序代码
-
-	m_CtrRichEdit.SetSel(0, -1);
-	m_CtrRichEdit.ReplaceSel("");
-
-}
-
 void CToolDlg::OnBnClickedBtnOpenPort()	//打开串口
 {
 	// TODO: 在此添加控件通知处理程序代码
@@ -615,6 +612,9 @@ void CToolDlg::OnBnClickedBtnOpenPort()	//打开串口
 				m_CtrRichEdit.ReplaceSel(_T("成功打开串口！\r\n"));
 				//MessageBox(_T(" 成功打开串口！"),_T("提示"));
 				m_Connected = 1;
+
+				//发送消息给B类
+				::SendMessage(m_ChildFrame->GetSafeHwnd(), WM_CHILDMESSAGE, WPARAM(m_Connected), 0);
 			}
 			else
 			{
@@ -641,6 +641,10 @@ void CToolDlg::OnBnClickedBtnOpenPort()	//打开串口
 
 			m_SerialPort.ClosePort();
 			m_Connected = 0;
+
+			//发送消息给B类
+			::SendMessage(m_ChildFrame->GetSafeHwnd(), WM_CHILDMESSAGE, WPARAM(m_Connected), 0);
+
 		}
 	}
 
@@ -928,6 +932,14 @@ LPARAM CToolDlg::OnComm(WPARAM ch, LPARAM port)
 				m_ListInfo.SetItemText(0, 3, strLocalVbat);
 
 				//m_ListCurrent表放数据
+				m_ListCurrent.SetItemText(0, 1, _T("A相接地电流"));
+				m_ListCurrent.SetItemText(1, 1, _T("B相接地电流"));
+				m_ListCurrent.SetItemText(2, 1, _T("C相接地电流"));
+				m_ListCurrent.SetItemText(3, 1, _T(" 总接地电流"));
+				m_ListCurrent.SetItemText(4, 1, _T("A相运行电流"));
+				m_ListCurrent.SetItemText(5, 1, _T("B相运行电流"));
+				m_ListCurrent.SetItemText(6, 1, _T("C相运行电流"));
+
 				m_ListCurrent.SetItemText(0, 2, strGroundCuA);
 				m_ListCurrent.SetItemText(1, 2, strGroundCuB);
 				m_ListCurrent.SetItemText(2, 2, strGroundCuC);
@@ -1339,6 +1351,14 @@ LPARAM CToolDlg::OnComm(WPARAM ch, LPARAM port)
 				m_ListInfo.SetItemText(0, 3, strLocalVbat);
 
 				//m_ListCurrent表放数据
+				m_ListCurrent.SetItemText(0, 1, _T("A相接地电流"));
+				m_ListCurrent.SetItemText(1, 1, _T("B相接地电流"));
+				m_ListCurrent.SetItemText(2, 1, _T("C相接地电流"));
+				m_ListCurrent.SetItemText(3, 1, _T(" 总接地电流"));
+				m_ListCurrent.SetItemText(4, 1, _T("A相运行电流"));
+				m_ListCurrent.SetItemText(5, 1, _T("B相运行电流"));
+				m_ListCurrent.SetItemText(6, 1, _T("C相运行电流"));
+
 				m_ListCurrent.SetItemText(0, 2, strGroundCuA);
 				m_ListCurrent.SetItemText(1, 2, strGroundCuB);
 				m_ListCurrent.SetItemText(2, 2, strGroundCuC);
@@ -1560,19 +1580,6 @@ CString CToolDlg::hexCharToNumber(char HexChar)
 		result += char(temp + 'A' - 10);
 	return result;
 }
-
-void CToolDlg::OnBnClickedSendorderButton1()
-{
-	// TODO: 在此添加控件通知处理程序代码
-	if (!orderEditDlg->IsWindowVisible())
-	{
-		orderEditDlg->ShowWindow(SW_SHOW);
-
-	}
-	else
-		orderEditDlg->ShowWindow(SW_HIDE);
-}
-
 
 void CToolDlg::OnBnClickedButtonCal()
 {	// TODO: 在此添加控件通知处理程序代码
@@ -2145,20 +2152,6 @@ void CToolDlg::OnBnClickedButton2()
 }
 
 
-void CToolDlg::OnBnClickedButton3()
-{
-	// TODO: 在此添加控件通知处理程序代码
-	if (m_Connected)
-	{
-		CString str;
-		CTime tm = CTime::GetCurrentTime();
-		CString nowDateTime = tm.Format(_T("%Y-%m-%d@%H:%M:%S"));
-		CString order = _T(">TIME:") + nowDateTime + _T("\r\n");
-
-		m_SerialPort.WriteToPort(order.GetBuffer(order.GetLength()));
-	}
-}
-
 
 void CToolDlg::OnBnClickedCheck1()
 {
@@ -2442,27 +2435,6 @@ void CToolDlg::OnBnClickedCheck7()
 }
 
 
-void CToolDlg::OnBnClickedButtonSave()
-{
-	// TODO: 在此添加控件通知处理程序代码
-	if (m_Connected)
-	{
-		CString order = _T(">SAVE\r\n");
-		m_SerialPort.WriteToPort(order.GetBuffer(order.GetLength()));
-	}
-
-}
-
-
-void CToolDlg::OnBnClickedshowstatebtn()
-{
-	// TODO: 在此添加控件通知处理程序代码
-	if (m_Connected)
-	{
-		CString order(">SHOW_STAT\r\n");
-		m_SerialPort.WriteToPort(order);
-	}
-}
 
 void CToolDlg::OnEnChangeEditip1()
 {
@@ -2583,57 +2555,6 @@ void CToolDlg::OnEnChangeEditport()
 	UpdateData(FALSE);
 }
 
-
-
-void CToolDlg::OnBnClickedOpenchildframe()
-{
-	// TODO: 在此添加控件通知处理程序代码
-	::SendMessage(m_ChildFrame->GetSafeHwnd(), WM_CHILDMESSAGE, WPARAM(m_Connected), 0);
-
-	if (!GetDlgItem(IDC_STATIC_ChildArea)->IsWindowVisible())
-	{
-		GetDlgItem(IDC_STATIC_ChildArea)->ShowWindow(SW_SHOW);
-		m_ChildFrame->ShowWindow(SW_SHOW);
-
-		m_currentSet_List.ShowWindow(SW_HIDE);		//通过隐藏其他控件
-		GetDlgItem(IDC_BUTTON1)->ShowWindow(SW_HIDE);
-		GetDlgItem(IDC_COMBO2)->ShowWindow(SW_HIDE);
-		GetDlgItem(IDC_BUTTON_Cal)->ShowWindow(SW_HIDE);
-		GetDlgItem(IDC_BUTTON_SET)->ShowWindow(SW_HIDE);
-		GetDlgItem(AutoDefaultBtn)->ShowWindow(SW_HIDE);
-		GetDlgItem(IDC_CHECK1)->ShowWindow(SW_HIDE);
-		GetDlgItem(IDC_CHECK2)->ShowWindow(SW_HIDE);
-		GetDlgItem(IDC_CHECK3)->ShowWindow(SW_HIDE);
-		GetDlgItem(IDC_CHECK4)->ShowWindow(SW_HIDE);
-		GetDlgItem(IDC_CHECK5)->ShowWindow(SW_HIDE);
-		GetDlgItem(IDC_CHECK6)->ShowWindow(SW_HIDE);
-		GetDlgItem(IDC_CHECK7)->ShowWindow(SW_HIDE);
-
-
-		m_ChildFrame->SetWindowPos(&wndTopMost, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE);
-	}
-	else
-	{
-		GetDlgItem(IDC_STATIC_ChildArea)->ShowWindow(SW_HIDE);
-		m_ChildFrame->ShowWindow(SW_HIDE);
-
-		m_currentSet_List.ShowWindow(SW_SHOW);		//通过隐藏其他控件
-		GetDlgItem(IDC_BUTTON1)->ShowWindow(SW_SHOW);
-		GetDlgItem(IDC_COMBO2)->ShowWindow(SW_SHOW);
-		GetDlgItem(IDC_BUTTON_Cal)->ShowWindow(SW_SHOW);
-		GetDlgItem(IDC_BUTTON_SET)->ShowWindow(SW_SHOW);
-		GetDlgItem(AutoDefaultBtn)->ShowWindow(SW_SHOW);
-		GetDlgItem(IDC_CHECK1)->ShowWindow(SW_SHOW);
-		GetDlgItem(IDC_CHECK2)->ShowWindow(SW_SHOW);
-		GetDlgItem(IDC_CHECK3)->ShowWindow(SW_SHOW);
-		GetDlgItem(IDC_CHECK4)->ShowWindow(SW_SHOW);
-		GetDlgItem(IDC_CHECK5)->ShowWindow(SW_SHOW);
-		GetDlgItem(IDC_CHECK6)->ShowWindow(SW_SHOW);
-		GetDlgItem(IDC_CHECK7)->ShowWindow(SW_SHOW);
-	}
-}
-
-
 void CToolDlg::OnNMDblclkList4(NMHDR* pNMHDR, LRESULT* pResult)
 {
 	LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
@@ -2666,14 +2587,6 @@ void CToolDlg::OnNMDblclkList4(NMHDR* pNMHDR, LRESULT* pResult)
 	*pResult = 0;
 }
 
-void CToolDlg::OnBnClickedAutodefaultbtn()
-{
-	// TODO: 在此添加控件通知处理程序代码
-	if (m_Connected)
-	{
-		SetTimer(1, 50, 0);
-	}
-}
 
 void CToolDlg::OnNMClickListCurrent(NMHDR* pNMHDR, LRESULT* pResult)
 {
@@ -2722,8 +2635,8 @@ BOOL CToolDlg::DestroyWindow()
 	CString baudrateStr, Ip1,Ip2,Ip3,Ip4,portStr;
 	GetDlgItem(IDC_CBO_BAUD_RATE)->GetWindowTextA(baudrateStr);
 	GetDlgItem(EditIP1)->GetWindowTextA(Ip1);
-	GetDlgItem(EditIp2)->GetWindowTextA(Ip2);	
-	GetDlgItem(EditIP3)->GetWindowTextA(Ip3);	
+	GetDlgItem(EditIp2)->GetWindowTextA(Ip2);
+	GetDlgItem(EditIP3)->GetWindowTextA(Ip3);
 	GetDlgItem(EditIP4)->GetWindowTextA(Ip4);
 	GetDlgItem(IDC_EDIT_Port)->GetWindowTextA(portStr);
 
@@ -2742,4 +2655,138 @@ afx_msg LRESULT CToolDlg::OnTochildMessage(WPARAM wParam, LPARAM lParam)
 {
 
 	return 0;
+}
+
+
+void CToolDlg::On32772()
+{
+	// TODO: 在此添加命令处理程序代码
+	ShellExecute(NULL, _T("open"), _T(".\\Defalut.ini"), NULL, NULL, SW_SHOWNORMAL);// 下划线的地方可以是网址或者是文件夹的位置，亦或者是文件的路径。
+}
+
+
+void CToolDlg::OnMenuCOrder()
+{
+	// TODO: 在此添加命令处理程序代码
+	GetDlgItem(IDC_STATIC_ChildArea)->ShowWindow(SW_HIDE);
+	m_ChildFrame->ShowWindow(SW_HIDE);
+
+	m_currentSet_List.ShowWindow(SW_SHOW);		//通过隐藏其他控件
+	GetDlgItem(IDC_BUTTON1)->ShowWindow(SW_SHOW);
+	GetDlgItem(IDC_COMBO2)->ShowWindow(SW_SHOW);
+	GetDlgItem(IDC_BUTTON_Cal)->ShowWindow(SW_SHOW);
+	GetDlgItem(IDC_BUTTON_SET)->ShowWindow(SW_SHOW);
+	GetDlgItem(IDC_BUTTON2)->ShowWindow(SW_SHOW);
+	GetDlgItem(IDC_CHECK1)->ShowWindow(SW_SHOW);
+	GetDlgItem(IDC_CHECK2)->ShowWindow(SW_SHOW);
+	GetDlgItem(IDC_CHECK3)->ShowWindow(SW_SHOW);
+	GetDlgItem(IDC_CHECK4)->ShowWindow(SW_SHOW);
+	GetDlgItem(IDC_CHECK5)->ShowWindow(SW_SHOW);
+	GetDlgItem(IDC_CHECK6)->ShowWindow(SW_SHOW);
+	GetDlgItem(IDC_CHECK7)->ShowWindow(SW_SHOW);
+}
+
+
+void CToolDlg::OnMenuBOrder()
+{
+	// TODO: 在此添加命令处理程序代码
+	GetDlgItem(IDC_STATIC_ChildArea)->ShowWindow(SW_SHOW);
+	m_ChildFrame->ShowWindow(SW_SHOW);
+
+	m_currentSet_List.ShowWindow(SW_HIDE);		//通过隐藏其他控件
+	GetDlgItem(IDC_BUTTON1)->ShowWindow(SW_HIDE);
+	GetDlgItem(IDC_COMBO2)->ShowWindow(SW_HIDE);
+	GetDlgItem(IDC_BUTTON_Cal)->ShowWindow(SW_HIDE);
+	GetDlgItem(IDC_BUTTON_SET)->ShowWindow(SW_HIDE);
+	GetDlgItem(IDC_BUTTON2)->ShowWindow(SW_HIDE);
+	GetDlgItem(IDC_CHECK1)->ShowWindow(SW_HIDE);
+	GetDlgItem(IDC_CHECK2)->ShowWindow(SW_HIDE);
+	GetDlgItem(IDC_CHECK3)->ShowWindow(SW_HIDE);
+	GetDlgItem(IDC_CHECK4)->ShowWindow(SW_HIDE);
+	GetDlgItem(IDC_CHECK5)->ShowWindow(SW_HIDE);
+	GetDlgItem(IDC_CHECK6)->ShowWindow(SW_HIDE);
+	GetDlgItem(IDC_CHECK7)->ShowWindow(SW_HIDE);
+
+
+	m_ChildFrame->SetWindowPos(&wndTopMost, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE);
+
+}
+
+
+void CToolDlg::OnTimeSet()
+{
+	// TODO: 在此添加命令处理程序代码
+	if (m_Connected)
+	{
+		CString str;
+		CTime tm = CTime::GetCurrentTime();
+		CString nowDateTime = tm.Format(_T("%Y-%m-%d@%H:%M:%S"));
+		CString order = _T(">TIME:") + nowDateTime + _T("\r\n");
+
+		m_SerialPort.WriteToPort(order.GetBuffer(order.GetLength()));
+	}
+}
+
+
+void CToolDlg::OnMenuShowState()
+{
+	// TODO: 在此添加命令处理程序代码
+	if (m_Connected)
+	{
+		CString order(">SHOW_STAT\r\n");
+		m_SerialPort.WriteToPort(order);
+	}
+}
+
+
+void CToolDlg::OnMenuOrder()
+{
+	// TODO: 在此添加命令处理程序代码
+	if (!orderEditDlg->IsWindowVisible())
+	{
+		orderEditDlg->ShowWindow(SW_SHOW);
+
+	}
+	else
+		orderEditDlg->ShowWindow(SW_HIDE);
+}
+
+void CToolDlg::OnMenuSetDefault()
+{
+	// TODO: 在此添加命令处理程序代码
+	if (m_Connected)
+	{
+		SetTimer(1, 50, 0);
+	}
+}
+
+
+void CToolDlg::OnMenuSaveCache()
+{
+	// TODO: 在此添加命令处理程序代码
+	if (m_Connected)
+	{
+		CString order = _T(">SAVE\r\n");
+		m_SerialPort.WriteToPort(order.GetBuffer(order.GetLength()));
+	}
+}
+
+
+void CToolDlg::OnMenuClearReceive()
+{
+	// TODO: 在此添加命令处理程序代码
+	m_CtrRichEdit.SetSel(0, -1);
+	m_CtrRichEdit.ReplaceSel("");
+}
+
+
+void CToolDlg::OnMenuAboutDlg()
+{
+	// TODO: 在此添加命令处理程序代码
+	INT_PTR nRes;             // 用于保存DoModal函数的返回值   
+
+	CAboutDlg aboutDlg;           // 构造对话框类CTipDlg的实例   
+	nRes = aboutDlg.DoModal();  // 弹出对话框   
+	if (IDCANCEL == nRes)     // 判断对话框退出后返回值是否为IDCANCEL，如果是则return，否则继续向下执行   
+		return;   
 }

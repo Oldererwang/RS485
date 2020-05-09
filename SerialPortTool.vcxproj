@@ -117,6 +117,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="AboutDlg.cpp" />
     <ClCompile Include="ChildFrame.cpp" />
     <ClCompile Include="OrderEdit.cpp" />
     <ClCompile Include="SerialPort.cpp" />
@@ -128,6 +129,7 @@
     <ClCompile Include="ToolDlg.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AboutDlg.h" />
     <ClInclude Include="ChildFrame.h" />
     <ClInclude Include="OrderEdit.h" />
     <ClInclude Include="Resource.h" />

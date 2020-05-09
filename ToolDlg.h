@@ -109,18 +109,13 @@ protected:
 	DECLARE_MESSAGE_MAP()
 public:
 	afx_msg void OnBnClickedBtnOpenPort();
-	afx_msg void OnBnClickedBtnClearReceive();
 	afx_msg void OnBnClickedChkAutoSendData();
 	afx_msg void OnBnClickedChkHexSend();
 	afx_msg void OnBnClickedChkReceive();
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
 	afx_msg LPARAM OnComm(WPARAM ch, LPARAM port);
-	afx_msg void OnBnClickedOk();
-	afx_msg void OnBnClickedCancel();
 	CListCtrl m_ListCurrent;
 	CListCtrl m_ListInfo;
-	afx_msg void OnBnClickedButton1();
-	afx_msg void OnBnClickedSendorderButton1();
 	CListCtrl m_currentSet_List;
 	CComboBox m_cboCurrent;
 	afx_msg void OnBnClickedButtonCal();
@@ -136,7 +131,6 @@ public:
 	afx_msg void OnBnClickedButtonSet();
 	afx_msg void OnBnClickedDefault();
 	afx_msg void OnBnClickedButton2();
-	afx_msg void OnBnClickedButton3();
 	afx_msg void OnBnClickedCheck1();
 	afx_msg void OnBnClickedCheck2();
 	afx_msg void OnBnClickedCheck3();
@@ -144,8 +138,6 @@ public:
 	afx_msg void OnBnClickedCheck5();
 	afx_msg void OnBnClickedCheck6();
 	afx_msg void OnBnClickedCheck7();
-	afx_msg void OnBnClickedButtonSave();
-	afx_msg void OnBnClickedshowstatebtn();
 	CString editIp1;
 	CString editIp2;
 	CString editIp3;
@@ -162,7 +154,6 @@ protected:
 
 
 public:
-	afx_msg void OnBnClickedOpenchildframe();
 	CTabCtrl m_tab;
 	//Ë«»÷listÊÂ¼þ
 	afx_msg void OnNMDblclkList4(NMHDR* pNMHDR, LRESULT* pResult);
@@ -170,7 +161,6 @@ public:
 	
 	CEdit m_CurrentEdit;
 
-	afx_msg void OnBnClickedAutodefaultbtn();
 	afx_msg void OnNMClickListCurrent(NMHDR* pNMHDR, LRESULT* pResult);
 	CRichEditCtrl m_CtrRichEdit;
 	CString m_StrRichEdit;
@@ -182,4 +172,16 @@ public:
 	virtual BOOL DestroyWindow();
 protected:
 	afx_msg LRESULT OnTochildMessage(WPARAM wParam, LPARAM lParam);
+
+public:
+	afx_msg void On32772();
+	afx_msg void OnMenuCOrder();
+	afx_msg void OnMenuBOrder();
+	afx_msg void OnTimeSet();
+	afx_msg void OnMenuShowState();
+	afx_msg void OnMenuOrder();
+	afx_msg void OnMenuSetDefault();
+	afx_msg void OnMenuSaveCache();
+	afx_msg void OnMenuClearReceive();
+	afx_msg void OnMenuAboutDlg();
 };
