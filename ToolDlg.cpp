@@ -193,6 +193,13 @@ BOOL CToolDlg::OnInitDialog()
 	GetDlgItem(EditIP3)->SetWindowTextA(IpStrr3);
 	GetDlgItem(EditIP4)->SetWindowTextA(IpStrr4);
 
+	//这一部分是稍微美化窗口：窗口圆角和菜单栏颜色
+	CRgn rgnTemp;
+	RECT rc;
+	GetClientRect(&rc);
+	rgnTemp.CreateRoundRectRgn(rc.left + 3, rc.top + 3, rc.right - rc.left + 5, rc.bottom - rc.top + 50, 6, 6);
+	SetWindowRgn(rgnTemp, true);
+
 	/*这一部分是改变控件内字体的大小*/
 	m_editFont.CreatePointFont(150, _T("Times New Roman"));
 	m_currentSet_List.SetFont(&m_editFont);
@@ -443,8 +450,6 @@ BOOL CToolDlg::OnInitDialog()
 	m_cboCurrent.InsertString(1, _T("3.5A"));
 	m_cboCurrent.InsertString(2, _T("100A"));
 	m_cboCurrent.SetCurSel(0);
-
-	//
 
 	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
 }
