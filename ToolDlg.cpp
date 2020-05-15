@@ -43,6 +43,7 @@ CToolDlg::CToolDlg(CWnd* pParent /*=NULL*/)
 	endFLag = 0;
 	dfInt = 0;
 	orderFlag = -1;
+	unknow = 0;
 
 	for (int i = 0; i < 2048; ++i)
 	{
@@ -135,6 +136,7 @@ BEGIN_MESSAGE_MAP(CToolDlg, CDialog)
 	ON_COMMAND(ID_32779, &CToolDlg::OnMenuSaveCache)
 	ON_COMMAND(ID_32780, &CToolDlg::OnMenuClearReceive)
 	ON_COMMAND(ID_32773, &CToolDlg::OnMenuAboutDlg)
+	ON_BN_CLICKED(IDC_BUTTON3, &CToolDlg::OnBnClickedButton3)
 END_MESSAGE_MAP()
 
 
@@ -194,11 +196,11 @@ BOOL CToolDlg::OnInitDialog()
 	GetDlgItem(EditIP4)->SetWindowTextA(IpStrr4);
 
 	//这一部分是稍微美化窗口：窗口圆角和菜单栏颜色
-	CRgn rgnTemp;
-	RECT rc;
-	GetClientRect(&rc);
-	rgnTemp.CreateRoundRectRgn(rc.left + 3, rc.top + 3, rc.right - rc.left + 5, rc.bottom - rc.top + 50, 6, 6);
-	SetWindowRgn(rgnTemp, true);
+	//CRgn rgnTemp;
+	//RECT rc;
+	//GetClientRect(&rc);
+	//rgnTemp.CreateRoundRectRgn(rc.left + 3, rc.top + 3, rc.right - rc.left + 5, rc.bottom - rc.top + 50, 6, 6);
+	//SetWindowRgn(rgnTemp, true);
 
 	/*这一部分是改变控件内字体的大小*/
 	m_editFont.CreatePointFont(150, _T("Times New Roman"));
@@ -214,7 +216,7 @@ BOOL CToolDlg::OnInitDialog()
 
 	pfont.GetLogFont(&logfont);
 	logfont.lfHeight = logfont.lfHeight * 1.7;		//这里可以修改字体的高比例
-	logfont.lfWidth = logfont.lfWidth * 1.7;			//这里可以修改字体的宽比例
+	logfont.lfWidth = logfont.lfWidth * 1.7;		//这里可以修改字体的宽比例
 	font1.CreateFontIndirect(&logfont);
 	m_ListCurrent.SetFont(&font1);
 
@@ -326,7 +328,7 @@ BOOL CToolDlg::OnInitDialog()
 	/*这一部分是创建命令子窗口并隐藏*/
 	orderEditDlg = new COrderEdit;
 	orderEditDlg->Create(IDD_EDIT_DIALOG, this);
-	orderEditDlg->SetWindowPos(&CWnd::wndTop, (rt1.right), rt3.top + 10, 0, 0, SWP_NOSIZE);	//设置子窗口位置
+	orderEditDlg->SetWindowPos(&CWnd::wndTop, (rt1.right), rt3.top - 20, 0, 0, SWP_NOSIZE);	//设置子窗口位置
 
 	//编辑框指定文本
 	orderEditDlg->SetDlgItemText(IDC_EDIT1, ">DEVICE_ID:ZTZN0001");
@@ -346,9 +348,9 @@ BOOL CToolDlg::OnInitDialog()
 	orderEditDlg->SetDlgItemText(IDC_EDIT15, ">SAVE");
 	orderEditDlg->SetDlgItemText(IDC_EDIT16, ">SHOW_STAT");
 	orderEditDlg->SetDlgItemText(IDC_EDIT17, ">SHOW_CALIB");
-	//orderEditDlg->SetDlgItemText(IDC_EDIT18,"");
-	orderEditDlg->SetDlgItemText(IDC_EDIT19, ">UPDATE");
-	//orderEditDlg->SetDlgItemText(IDC_EDIT20,"");
+	orderEditDlg->SetDlgItemText(IDC_EDIT18,">ADMIN");
+	orderEditDlg->SetDlgItemText(IDC_EDIT19, ">USER");
+	orderEditDlg->SetDlgItemText(IDC_EDIT20,">SHOW_CURR");
 
 	orderEditDlg->ShowWindow(SW_HIDE);
 	m_CurrentEdit.ShowWindow(SW_HIDE);
@@ -384,23 +386,23 @@ BOOL CToolDlg::OnInitDialog()
 	m_currentSet_List.InsertItem(4, _T(""));
 	m_currentSet_List.InsertItem(5, _T(""));
 	m_currentSet_List.InsertItem(6, _T(""));
-	m_currentSet_List.SetItemText(0, 0, _T("通道1:"));
-	m_currentSet_List.SetItemText(1, 0, _T("通道2:"));
-	m_currentSet_List.SetItemText(2, 0, _T("通道3:"));
-	m_currentSet_List.SetItemText(3, 0, _T("通道4:"));
-	m_currentSet_List.SetItemText(4, 0, _T("通道5:"));
-	m_currentSet_List.SetItemText(5, 0, _T("通道6:"));
-	m_currentSet_List.SetItemText(6, 0, _T("通道7:"));
+	m_currentSet_List.SetItemText(0, 0, _T("通道0:"));
+	m_currentSet_List.SetItemText(1, 0, _T("通道1:"));
+	m_currentSet_List.SetItemText(2, 0, _T("通道2:"));
+	m_currentSet_List.SetItemText(3, 0, _T("通道3:"));
+	m_currentSet_List.SetItemText(4, 0, _T("通道4:"));
+	m_currentSet_List.SetItemText(5, 0, _T("通道5:"));
+	m_currentSet_List.SetItemText(6, 0, _T("通道6:"));
 
 	m_ListInfo.InsertItem(0, _T(""));
 
-	m_ListCurrent.InsertItem(0, _T("通道1:"));
-	m_ListCurrent.InsertItem(1, _T("通道2:"));
-	m_ListCurrent.InsertItem(2, _T("通道3:"));
-	m_ListCurrent.InsertItem(3, _T("通道4:"));
-	m_ListCurrent.InsertItem(4, _T("通道5:"));
-	m_ListCurrent.InsertItem(5, _T("通道6:"));
-	m_ListCurrent.InsertItem(6, _T("通道7:"));
+	m_ListCurrent.InsertItem(0, _T("通道0:"));
+	m_ListCurrent.InsertItem(1, _T("通道1:"));
+	m_ListCurrent.InsertItem(2, _T("通道2:"));
+	m_ListCurrent.InsertItem(3, _T("通道3:"));
+	m_ListCurrent.InsertItem(4, _T("通道4:"));
+	m_ListCurrent.InsertItem(5, _T("通道5:"));
+	m_ListCurrent.InsertItem(6, _T("通道6:"));
 
 	//m_ListCurrent.SetItemText(0, 1, _T("A相接地电流"));
 	//m_ListCurrent.SetItemText(1, 1, _T("B相接地电流"));
@@ -691,17 +693,18 @@ void CToolDlg::OnTimer(UINT_PTR nIDEvent)
 	{
 		CString cStr, order;
 		cStr.Format("%d", dfInt);
-		if (dfInt < 7)
+		if (dfInt < 8)
 		{
-			order = _T(">CALIB[") + _T(cStr) + _T("]:10000|+0000|10000|+0000|10000\r\n");
+			if (dfInt != 7)
+			{
+				order = _T(">CALIB[") + _T(cStr) + _T("]:10000|+0000|10000|+0000|10000\r\n");
+			}
+			else
+				order = _T(">USER\r\n");
 		}
-		//	else
-		//	order = _T(">SHOW_CALIB\r\n");
-
-		//MessageBox(_T("1123123"));
 		m_SerialPort.WriteToPort(order.GetBuffer(order.GetLength()));
 		dfInt++;
-		if (7 == dfInt)
+		if (8 == dfInt)
 		{
 			dfInt = 0;
 			KillTimer(1);
@@ -715,6 +718,7 @@ void CToolDlg::OnTimer(UINT_PTR nIDEvent)
 
 LPARAM CToolDlg::OnComm(WPARAM ch, LPARAM port)
 {
+	UpdateData(true);
 	/************************************************************************/
 	/* B类数据结构解析                                                         */
 	/************************************************************************/
@@ -751,7 +755,7 @@ LPARAM CToolDlg::OnComm(WPARAM ch, LPARAM port)
 
 					m_CtrRichEdit.SetSel(-1, -1);
 					m_CtrRichEdit.ReplaceSel(_T("0xA000指令 数据长度："));
-					m_CtrRichEdit.ReplaceSel(_T(sum) + _T("\r\n"));
+					m_CtrRichEdit.ReplaceSel(_T(sum) + _T("  "));
 
 				}
 				else if (_T("AA5500A1") == headData.Left(8))	//0xA100
@@ -763,7 +767,7 @@ LPARAM CToolDlg::OnComm(WPARAM ch, LPARAM port)
 
 					m_CtrRichEdit.SetSel(-1, -1);
 					m_CtrRichEdit.ReplaceSel(_T("0xA100指令 数据长度："));
-					m_CtrRichEdit.ReplaceSel(_T(sum) + _T("\r\n"));
+					m_CtrRichEdit.ReplaceSel(_T(sum) + _T("  "));
 				}
 				else if (_T("AA5500A2") == headData.Left(8))	//0xA200
 				{
@@ -773,7 +777,7 @@ LPARAM CToolDlg::OnComm(WPARAM ch, LPARAM port)
 					sum.Format("%d", sumInt1);
 					m_CtrRichEdit.SetSel(-1, -1);
 					m_CtrRichEdit.ReplaceSel(_T("0xA200指令 数据长度："));
-					m_CtrRichEdit.ReplaceSel(_T(sum) + _T("\r\n"));
+					m_CtrRichEdit.ReplaceSel(_T(sum) + _T("  "));
 				}
 				else if (_T("AA5500A3") == headData.Left(8))	//0xA300
 				{
@@ -783,7 +787,7 @@ LPARAM CToolDlg::OnComm(WPARAM ch, LPARAM port)
 					sum.Format("%d", sumInt1);
 					m_CtrRichEdit.SetSel(-1, -1);
 					m_CtrRichEdit.ReplaceSel(_T("0xA300指令 数据长度："));
-					m_CtrRichEdit.ReplaceSel(_T(sum) + _T("\r\n"));
+					m_CtrRichEdit.ReplaceSel(_T(sum) + _T("  "));
 				}
 				else if (_T("AA5500A4") == headData.Left(8))	//0xA400
 				{
@@ -793,7 +797,7 @@ LPARAM CToolDlg::OnComm(WPARAM ch, LPARAM port)
 					sum.Format("%d", sumInt1);
 					m_CtrRichEdit.SetSel(-1, -1);
 					m_CtrRichEdit.ReplaceSel(_T("0xA400指令 数据长度："));
-					m_CtrRichEdit.ReplaceSel(_T(sum) + _T("\r\n"));
+					m_CtrRichEdit.ReplaceSel(_T(sum) + _T("  "));
 				}
 			}
 		}
@@ -825,6 +829,21 @@ LPARAM CToolDlg::OnComm(WPARAM ch, LPARAM port)
 				time1.Format("%d", timeInt1);
 				time2.Format("%d", timeInt2);
 				time3.Format("%d", timeInt3);
+				if (timeInt1 < 10)
+				{
+					time1 = _T("0") + time1;
+				}
+
+				if (timeInt2 < 10)
+				{
+					time2 = _T("0") + time2;
+				}
+				if (timeInt3 < 10)
+				{
+					time3 = _T("0") + time3;
+				}
+
+
 				CString systemTime = time3 + _T(":") + time2 + _T(":") + time1;
 
 				CString date1 = knowStrData.Mid(8, 2);; 	//日期	
@@ -836,14 +855,28 @@ LPARAM CToolDlg::OnComm(WPARAM ch, LPARAM port)
 				date1.Format("%d", dateInt1);
 				date2.Format("%d", dateInt2);
 				date3.Format("%d", dateInt3);
+				if (dateInt3 < 10)
+				{
+					date3 = _T("0") + date3;
+				}
+				if (dateInt2 < 10)
+				{
+					date2 = _T("0") + date2;
+				}
+				if (dateInt1 < 10)
+				{
+					date1 = _T("0") + date1;
+				}
+
 				CString systemDate = _T("20") + date3 + _T("-") + date2 + _T("-") + date1;
 				
 				m_CtrRichEdit.SetSel(-1, -1);
 				m_CtrRichEdit.ReplaceSel(_T("日期时间："));
-				m_CtrRichEdit.ReplaceSel(systemDate + _T("  ") + systemTime + _T("\r\n"));
+				m_CtrRichEdit.ReplaceSel(systemDate + _T("  ") + systemTime + _T("  ") );
 
 				//解析运行时长，电压和电流
 				CString strRunTime;
+				CString strCount;
 				CString strLocalVbat;
 				CString strGroundCuA;
 				CString strGroundCuB;
@@ -916,8 +949,18 @@ LPARAM CToolDlg::OnComm(WPARAM ch, LPARAM port)
 				CString tm2 = knowStrData.Mid(170, 2);
 				CString tm3 = knowStrData.Mid(172, 2);
 				CString tm4 = knowStrData.Mid(174, 2);
+				CStringArray cSArrCount;
+				cSArrCount.Add(knowStrData.Mid(176, 2));
+				cSArrCount.Add(knowStrData.Mid(178, 2));
+				cSArrCount.Add(knowStrData.Mid(180, 2));
+				cSArrCount.Add(knowStrData.Mid(182, 2));
 
 				int value = _tcstoul(_T(tm4 + tm3 + tm2 + tm1), NULL, 16);
+				int count = _tcstoul(_T(cSArrCount[3] + cSArrCount[2] + cSArrCount[1] + cSArrCount[0]), NULL, 16);
+				strCount.Format("%d", count);
+				m_CtrRichEdit.ReplaceSel(_T("保存地址 ") + strCount + _T("\r\n"));
+
+
 				CString sH, sM, sS;
 				sH.Format("%d", value / 3600);
 				sM.Format("%d", (value - (value / 3600) * 3600) / 60);
@@ -1021,20 +1064,34 @@ LPARAM CToolDlg::OnComm(WPARAM ch, LPARAM port)
 				knowStrData = hex2data(hexData);	//得到需要解析的字符串knowStrData		
 
 				//解析日期和时间
-				CString time1 = knowStrData.Mid(10, 2); 	//时间	
-				CString time2 = knowStrData.Mid(12, 2);
-				CString time3 = knowStrData.Mid(14, 2);
+				CString time1 = knowStrData.Mid(8, 2); 	//时间	
+				CString time2 = knowStrData.Mid(10, 2);
+				CString time3 = knowStrData.Mid(12, 2);
 				int timeInt1 = _tcstoul(_T(time1), NULL, 16);
 				int timeInt2 = _tcstoul(_T(time2), NULL, 16);
 				int timeInt3 = _tcstoul(_T(time3), NULL, 16);
 				time1.Format("%d", timeInt1);
 				time2.Format("%d", timeInt2);
 				time3.Format("%d", timeInt3);
-				CString systemTime = time1 + _T(":") + time2 + _T(":") + time3;
+				if (timeInt1 < 10)
+				{
+					time1 = _T("0") + time1;
+				}
 
-				CString date1 = knowStrData.Mid(2, 2);; 	//日期	
-				CString date2 = knowStrData.Mid(4, 2);
-				CString date3 = knowStrData.Mid(6, 2);
+				if (timeInt2 < 10)
+				{
+					time2 = _T("0") + time2;
+				}
+				if (timeInt3 < 10)
+				{
+					time3 = _T("0") + time3;
+				}
+
+				CString systemTime = time3 + _T(":") + time2 + _T(":") + time1;
+
+				CString date1 = knowStrData.Mid(0, 2);; 	//日期	
+				CString date2 = knowStrData.Mid(2, 2);
+				CString date3 = knowStrData.Mid(4, 2);
 				int dateInt1 = _tcstoul(_T(date1), NULL, 16);
 				int dateInt2 = _tcstoul(_T(date2), NULL, 16);
 				int dateInt3 = _tcstoul(_T(date3), NULL, 16);
@@ -1045,7 +1102,16 @@ LPARAM CToolDlg::OnComm(WPARAM ch, LPARAM port)
 				{
 					date1 = _T("0") + date1;
 				}
-				CString systemDate = _T("20") + date1 + _T("-") + date2 + _T("-") + date3;
+
+				if (dateInt2 < 10)
+				{
+					date2 = _T("0") + date2;
+				}
+				if (dateInt3 < 10)
+				{
+					date3 = _T("0") + date3;
+				}
+				CString systemDate = _T("20") + date3 + _T("-") + date2 + _T("-") + date1;
 				m_CtrRichEdit.ReplaceSel(_T("设置RTC时间："));
 				m_CtrRichEdit.ReplaceSel(systemDate + _T("  "));
 				m_CtrRichEdit.ReplaceSel(systemTime);
@@ -1081,24 +1147,202 @@ LPARAM CToolDlg::OnComm(WPARAM ch, LPARAM port)
 		}
 		else if (4 == orderFlag)
 		{
-			if (32 == m_iRxLen)
+			if (m_iRxLen == 148)
 			{
+				//解析设备ID
 				m_CtrRichEdit.SetSel(-1, -1);
 				m_CtrRichEdit.ReplaceSel(_T("设备ID："));
-				m_CtrRichEdit.ReplaceSel(msgNotice.Mid(8, 8));
-				m_CtrRichEdit.ReplaceSel("\r\n");
+				m_CtrRichEdit.ReplaceSel(msgNotice.Mid(8, 8) + _T("\r\n"));
 
-				for (int i = 0; i < 16; i++)
+				for (int i = 0; i < 132; i++)
 				{
 					m_HexData[i] = m_RxData[i + 16];
 				}
-				str2hex(m_HexData, hexData, 32);		//维护时str2hex可能需要更改参数
-				knowStrData = hex2data(hexData);	//得到需要解析的字符串knowStrData	
+				str2hex(m_HexData, hexData, 264);		//维护时str2hex可能需要更改参数
+				knowStrData = hex2data(hexData);	//得到需要解析的字符串knowStrData
+
+				//解析日期和时间
+				CString time1 = knowStrData.Mid(0, 2);; 	//时间	
+				CString time2 = knowStrData.Mid(2, 2);
+				CString time3 = knowStrData.Mid(4, 2);
+				int timeInt1 = _tcstoul(_T(time1), NULL, 16);
+				int timeInt2 = _tcstoul(_T(time2), NULL, 16);
+				int timeInt3 = _tcstoul(_T(time3), NULL, 16);
+				time1.Format("%d", timeInt1);
+				time2.Format("%d", timeInt2);
+				time3.Format("%d", timeInt3);
+				if (timeInt1 < 10)
+				{
+					time1 = _T("0") + time1;
+				}
+
+				if (timeInt2 < 10)
+				{
+					time2 = _T("0") + time2;
+				}
+				if (timeInt3 < 10)
+				{
+					time3 = _T("0") + time3;
+				}
+
+
+				CString systemTime = time3 + _T(":") + time2 + _T(":") + time1;
+
+				CString date1 = knowStrData.Mid(8, 2);; 	//日期	
+				CString date2 = knowStrData.Mid(10, 2);
+				CString date3 = knowStrData.Mid(12, 2);
+				int dateInt1 = _tcstoul(_T(date1), NULL, 16);
+				int dateInt2 = _tcstoul(_T(date2), NULL, 16);
+				int dateInt3 = _tcstoul(_T(date3), NULL, 16);
+				date1.Format("%d", dateInt1);
+				date2.Format("%d", dateInt2);
+				date3.Format("%d", dateInt3);
+				if (dateInt3 < 10)
+				{
+					date3 = _T("0") + date3;
+				}
+				if (dateInt2 < 10)
+				{
+					date2 = _T("0") + date2;
+				}
+				if (dateInt1 < 10)
+				{
+					date1 = _T("0") + date1;
+				}
+
+				CString systemDate = _T("20") + date3 + _T("-") + date2 + _T("-") + date1;
+
+				m_CtrRichEdit.SetSel(-1, -1);
+				m_CtrRichEdit.ReplaceSel(_T("日期时间："));
+				m_CtrRichEdit.ReplaceSel(systemDate + _T("  ") + systemTime + _T("  "));
+
+				//解析运行时长，电压和电流
+				CString strRunTime;
+				CString strCount;
+				CString strLocalVbat;
+				CString strGroundCuA;
+				CString strGroundCuB;
+				CString strGroundCuC;
+				CString strGroundCuAll;
+				CString strCurrentA;
+				CString strCurrentB;
+				CString strCurrentC;
+
+				BYTE byteLocalVbat[5];
+				BYTE byteGroundCuA[5];
+				BYTE byteGroundCuB[5];
+				BYTE byteGroundCuC[5];
+				BYTE byteGroundCuAll[5];
+				BYTE byteCurrentA[5];
+				BYTE byteCurrentB[5];
+				BYTE byteCurrentC[5];
+
+				float fLocalVbat;
+				float fGroundCuA;
+				float fGroundCuB;
+				float fGroundCuC;
+				float fGroundCuAll;
+				float fCurrentA;
+				float fCurrentB;
+				float fCurrentC;
+
+				//16位CString转换为字节数组
+				hexString2Byte(knowStrData.Mid(80, 8), byteLocalVbat);	//电池电压
+				hexString2Byte(knowStrData.Mid(16, 8), byteGroundCuA);
+				hexString2Byte(knowStrData.Mid(24, 8), byteGroundCuB);
+				hexString2Byte(knowStrData.Mid(32, 8), byteGroundCuC);
+				hexString2Byte(knowStrData.Mid(40, 8), byteGroundCuAll);
+				hexString2Byte(knowStrData.Mid(48, 8), byteCurrentA);
+				hexString2Byte(knowStrData.Mid(56, 8), byteCurrentB);
+				hexString2Byte(knowStrData.Mid(64, 8), byteCurrentC);
+
+				//防止越界 维护时修改
+				byteLocalVbat[4] = '\0';
+				byteGroundCuA[4] = '\0';
+				byteGroundCuB[4] = '\0';
+				byteGroundCuC[4] = '\0';
+				byteGroundCuAll[4] = '\0';
+				byteCurrentA[4] = '\0';
+				byteCurrentB[4] = '\0';
+				byteCurrentC[4] = '\0';
+
+				//字节数组转成浮点数
+				memcpy(&fLocalVbat, &byteLocalVbat[0], 4);
+				memcpy(&fGroundCuA, &byteGroundCuA[0], 4);
+				memcpy(&fGroundCuB, &byteGroundCuB[0], 4);
+				memcpy(&fGroundCuC, &byteGroundCuC[0], 4);
+				memcpy(&fGroundCuAll, &byteGroundCuAll[0], 4);
+				memcpy(&fCurrentA, &byteCurrentA[0], 4);
+				memcpy(&fCurrentB, &byteCurrentB[0], 4);
+				memcpy(&fCurrentC, &byteCurrentC[0], 4);
+
+				//浮点数转回CString
+				strLocalVbat.Format("%.4lf", fLocalVbat);
+				strGroundCuA.Format("%.4lf", fGroundCuA);
+				strGroundCuB.Format("%.4lf", fGroundCuB);
+				strGroundCuC.Format("%.4lf", fGroundCuC);
+				strGroundCuAll.Format("%.4lf", fGroundCuAll);
+				strCurrentA.Format("%.4lf", fCurrentA);
+				strCurrentB.Format("%.4lf", fCurrentB);
+				strCurrentC.Format("%.4lf", fCurrentC);
+
+				//解析时间
+				CString tm1 = knowStrData.Mid(168, 2);
+				CString tm2 = knowStrData.Mid(170, 2);
+				CString tm3 = knowStrData.Mid(172, 2);
+				CString tm4 = knowStrData.Mid(174, 2);
+				CStringArray cSArrCount;
+				cSArrCount.Add(knowStrData.Mid(176, 2));
+				cSArrCount.Add(knowStrData.Mid(178, 2));
+				cSArrCount.Add(knowStrData.Mid(180, 2));
+				cSArrCount.Add(knowStrData.Mid(182, 2));
+
+				int value = _tcstoul(_T(tm4 + tm3 + tm2 + tm1), NULL, 16);
+				int count = _tcstoul(_T(cSArrCount[3] + cSArrCount[2] + cSArrCount[1] + cSArrCount[0]), NULL, 16);
+				strCount.Format("%d", count);
+				m_CtrRichEdit.ReplaceSel(_T("保存地址 ") + strCount + _T("\r\n"));
+
+
+				CString sH, sM, sS;
+				sH.Format("%d", value / 3600);
+				sM.Format("%d", (value - (value / 3600) * 3600) / 60);
+				sS.Format("%d", (value % 3600) % 60);
+				if (sH.GetLength() < 2)
+					sH = "0" + sH;
+				if (sM.GetLength() < 2)
+					sM = "0" + sM;
+				if (sS.GetLength() < 2)
+					sS = "0" + sS;
+				strRunTime = sH + ":" + sM + ":" + sS;
+
+				//Info表放数据
+				m_ListInfo.SetItemText(0, 0, msgNotice.Mid(8, 8));
+				m_ListInfo.SetItemText(0, 1, systemDate);
+				m_ListInfo.SetItemText(0, 2, strRunTime);
+				m_ListInfo.SetItemText(0, 3, strLocalVbat);
+
+				//m_ListCurrent表放数据
+				m_ListCurrent.SetItemText(0, 1, _T("A相接地电流"));
+				m_ListCurrent.SetItemText(1, 1, _T("B相接地电流"));
+				m_ListCurrent.SetItemText(2, 1, _T("C相接地电流"));
+				m_ListCurrent.SetItemText(3, 1, _T(" 总接地电流"));
+				m_ListCurrent.SetItemText(4, 1, _T("A相运行电流"));
+				m_ListCurrent.SetItemText(5, 1, _T("B相运行电流"));
+				m_ListCurrent.SetItemText(6, 1, _T("C相运行电流"));
+
+				m_ListCurrent.SetItemText(0, 2, strGroundCuA);
+				m_ListCurrent.SetItemText(1, 2, strGroundCuB);
+				m_ListCurrent.SetItemText(2, 2, strGroundCuC);
+				m_ListCurrent.SetItemText(3, 2, strGroundCuAll);
+				m_ListCurrent.SetItemText(4, 2, strCurrentA);
+				m_ListCurrent.SetItemText(5, 2, strCurrentB);
+				m_ListCurrent.SetItemText(6, 2, strCurrentC);
 
 				//回到初始值
-				orderFlag = -1;	//重新判断
+				orderFlag = -1;
 				m_iRxLen = 0;
 				msgNotice = _T("");
+
 			}
 		}
 
@@ -1111,12 +1355,12 @@ LPARAM CToolDlg::OnComm(WPARAM ch, LPARAM port)
 	/************************************************************************/
 	if (_T("115200") == cboStr)
 	{
-		int selcount = m_CtrRichEdit.GetLineCount();
 		CString strTemp;
 		strTemp.Format("%d", m_iRxLen);
 		m_RxData[m_iRxLen] = ch;	//缓冲字符数组
 		msgNotice += char(ch);
 		CString msgTemp = " 采集数据:";
+		CString msgTemp0 = "采集数据:";
 		m_iRxLen++;				//控制行数
 		if ((m_RxData[m_iRxLen - 2] == '\r' && m_RxData[m_iRxLen - 1] == '\n'))
 		{
@@ -1222,13 +1466,13 @@ LPARAM CToolDlg::OnComm(WPARAM ch, LPARAM port)
 				m_CurrentEdit.SetWindowTextA(tempp);
 			}
 
-			if (msgTemp == msgNotice.Mid(0, 10))
+			if (_T(msgTemp0) == msgNotice.Mid(0, 9))
 			{
 				for (int i = 0; i < 130; i++)
 				{
-					m_HexData[i] = m_RxData[i + 18];
+					m_HexData[i] = m_RxData[i + 17];
 				}
-				str2hex(m_HexData, hexData,250);		//维护时str2hex可能需要更改参数
+				str2hex(m_HexData, hexData, 250);		//维护时str2hex可能需要更改参数
 				knowStrData = hex2data(hexData);	//得到需要解析的字符串knowStrData
 
 				CString systemID;
@@ -1258,6 +1502,177 @@ LPARAM CToolDlg::OnComm(WPARAM ch, LPARAM port)
 				{
 					date3 = _T("0") + date3;
 				}
+				if (dateInt2 < 10)
+				{
+					date2 = _T("0") + date2;
+				}
+				if (dateInt1 < 10)
+				{
+					date1 = _T("0") + date1;
+				}
+
+				CString systemDate = _T("20") + date3 + _T("-") + date2 + _T("-") + date1;
+
+				CString data2;
+				CString data3;
+				CString strRunTime;
+				CString strLocalVbat;
+				CString strGroundCuA;
+				CString strGroundCuB;
+				CString strGroundCuC;
+				CString strGroundCuAll;
+				CString strCurrentA;
+				CString strCurrentB;
+				CString strCurrentC;
+
+				BYTE byteLocalVbat[5];
+				BYTE byteGroundCuA[5];
+				BYTE byteGroundCuB[5];
+				BYTE byteGroundCuC[5];
+				BYTE byteGroundCuAll[5];
+				BYTE byteCurrentA[5];
+				BYTE byteCurrentB[5];
+				BYTE byteCurrentC[5];
+
+				float fLocalVbat;
+				float fGroundCuA;
+				float fGroundCuB;
+				float fGroundCuC;
+				float fGroundCuAll;
+				float fCurrentA;
+				float fCurrentB;
+				float fCurrentC;
+
+				//16位CString转换为字节数组
+				hexString2Byte(knowStrData.Mid(80, 8), byteLocalVbat);	//电池电压
+				hexString2Byte(knowStrData.Mid(16, 8), byteGroundCuA);
+				hexString2Byte(knowStrData.Mid(24, 8), byteGroundCuB);
+				hexString2Byte(knowStrData.Mid(32, 8), byteGroundCuC);
+				hexString2Byte(knowStrData.Mid(40, 8), byteGroundCuAll);
+				hexString2Byte(knowStrData.Mid(48, 8), byteCurrentA);
+				hexString2Byte(knowStrData.Mid(56, 8), byteCurrentB);
+				hexString2Byte(knowStrData.Mid(64, 8), byteCurrentC);
+
+				//防止越界 维护时修改
+				byteLocalVbat[4] = '\0';
+				byteGroundCuA[4] = '\0';
+				byteGroundCuB[4] = '\0';
+				byteGroundCuC[4] = '\0';
+				byteGroundCuAll[4] = '\0';
+				byteCurrentA[4] = '\0';
+				byteCurrentB[4] = '\0';
+				byteCurrentC[4] = '\0';
+
+				//字节数组转成浮点数
+				memcpy(&fLocalVbat, &byteLocalVbat[0], 4);
+				memcpy(&fGroundCuA, &byteGroundCuA[0], 4);
+				memcpy(&fGroundCuB, &byteGroundCuB[0], 4);
+				memcpy(&fGroundCuC, &byteGroundCuC[0], 4);
+				memcpy(&fGroundCuAll, &byteGroundCuAll[0], 4);
+				memcpy(&fCurrentA, &byteCurrentA[0], 4);
+				memcpy(&fCurrentB, &byteCurrentB[0], 4);
+				memcpy(&fCurrentC, &byteCurrentC[0], 4);
+
+				//浮点数转回CString
+				strLocalVbat.Format("%.4lf", fLocalVbat);
+				strGroundCuA.Format("%.4lf", fGroundCuA);
+				strGroundCuB.Format("%.4lf", fGroundCuB);
+				strGroundCuC.Format("%.4lf", fGroundCuC);
+				strGroundCuAll.Format("%.4lf", fGroundCuAll);
+				strCurrentA.Format("%.4lf", fCurrentA);
+				strCurrentB.Format("%.4lf", fCurrentB);
+				strCurrentC.Format("%.4lf", fCurrentC);
+
+				//解析时间
+				CString tm1 = knowStrData.Mid(168, 2);
+				CString tm2 = knowStrData.Mid(170, 2);
+				CString tm3 = knowStrData.Mid(172, 2);
+				CString tm4 = knowStrData.Mid(174, 2);
+
+				int value = _tcstoul(_T(tm4 + tm3 + tm2 + tm1), NULL, 16);
+				CString sH, sM, sS;
+				sH.Format("%d", value / 3600);
+				sM.Format("%d", (value - (value / 3600) * 3600) / 60);
+				sS.Format("%d", (value % 3600) % 60);
+				if (sH.GetLength() < 2)
+					sH = "0" + sH;
+				if (sM.GetLength() < 2)
+					sM = "0" + sM;
+				if (sS.GetLength() < 2)
+					sS = "0" + sS;
+				strRunTime = sH + ":" + sM + ":" + sS;
+
+				//Info表放数据
+				m_ListInfo.SetItemText(0, 0, systemID.Mid(9, 8));
+				m_ListInfo.SetItemText(0, 1, systemDate);
+				m_ListInfo.SetItemText(0, 2, strRunTime);
+				m_ListInfo.SetItemText(0, 3, strLocalVbat);
+
+				//m_ListCurrent表放数据
+				m_ListCurrent.SetItemText(0, 1, _T("A相接地电流"));
+				m_ListCurrent.SetItemText(1, 1, _T("B相接地电流"));
+				m_ListCurrent.SetItemText(2, 1, _T("C相接地电流"));
+				m_ListCurrent.SetItemText(3, 1, _T(" 总接地电流"));
+				m_ListCurrent.SetItemText(4, 1, _T("A相运行电流"));
+				m_ListCurrent.SetItemText(5, 1, _T("B相运行电流"));
+				m_ListCurrent.SetItemText(6, 1, _T("C相运行电流"));
+
+				m_ListCurrent.SetItemText(0, 2, strGroundCuA);
+				m_ListCurrent.SetItemText(1, 2, strGroundCuB);
+				m_ListCurrent.SetItemText(2, 2, strGroundCuC);
+				m_ListCurrent.SetItemText(3, 2, strGroundCuAll);
+				m_ListCurrent.SetItemText(4, 2, strCurrentA);
+				m_ListCurrent.SetItemText(5, 2, strCurrentB);
+				m_ListCurrent.SetItemText(6, 2, strCurrentC);
+
+
+			}
+
+			if (_T(msgTemp) == msgNotice.Mid(0, 10))
+			{
+				for (int i = 0; i < 130; i++)
+				{
+					m_HexData[i] = m_RxData[i + 18];
+				}
+				str2hex(m_HexData, hexData, 250);		//维护时str2hex可能需要更改参数
+				knowStrData = hex2data(hexData);	//得到需要解析的字符串knowStrData
+
+				CString systemID;
+				systemID.Format(_T("%s"), m_RxData);
+
+				int bugtest = 0;
+				////////////////////////////////////////////////////////////////////
+				/*
+				电流解析：
+				Mid函数：字符串切割
+				atof函数：16进制CString变成double
+				Format：变为带2位小数点字符串
+				hexString2Byte：16进制字符串变成BYTE数组
+				*/
+				////////////////////////////////////////////////////////////////////
+				CString strDivID;
+				CString date1 = knowStrData.Mid(8, 2);	//日期			
+				CString date2 = knowStrData.Mid(10, 2);
+				CString date3 = knowStrData.Mid(12, 2);
+				int dateInt1 = _tcstoul(_T(date1), NULL, 16);
+				int dateInt2 = _tcstoul(_T(date2), NULL, 16);
+				int dateInt3 = _tcstoul(_T(date3), NULL, 16);
+				date1.Format("%d", dateInt1);
+				date2.Format("%d", dateInt2);
+				date3.Format("%d", dateInt3);
+				if (dateInt3 < 10)
+				{
+					date3 = _T("0") + date3;
+				}
+				if (dateInt2 < 10)
+				{
+					date2 = _T("0") + date2;
+				}
+				if (dateInt1 < 10)
+				{
+					date1 = _T("0") + date1;
+				}
+
 				CString systemDate = _T("20") + date3 + _T("-") + date2 + _T("-") + date1;
 
 				CString data2;
@@ -1372,7 +1787,12 @@ LPARAM CToolDlg::OnComm(WPARAM ch, LPARAM port)
 				m_ListCurrent.SetItemText(5, 2, strCurrentB);
 				m_ListCurrent.SetItemText(6, 2, strCurrentC);
 
+
+
 			}
+
+
+
 
 			m_StrRichEdit = "";
 			msgNotice = "";
@@ -1380,7 +1800,7 @@ LPARAM CToolDlg::OnComm(WPARAM ch, LPARAM port)
 
 			int nline = m_CtrRichEdit.GetLineCount();
 
-			if (nline > 50000)
+			if (nline > 10000)
 			{
 				UpdateData(TRUE);
 				m_StrSendData = _T("");			//清空编辑区
@@ -1422,7 +1842,7 @@ CString CToolDlg::AvoidLarge(CString cstr)
 	}
 	else if (num <= 0)
 	{
-		CString wodema("1.0000");
+		CString wodema("0.0000");
 		return wodema;
 	}
 	else
@@ -1640,13 +2060,20 @@ void CToolDlg::OnBnClickedButtonCal()
 				kCh5.Format(_T("%.3f"), (3.5 + atof(bCh5)) / atof(strCh5));
 				kCh6.Format(_T("%.3f"), (3.5 + atof(bCh6)) / atof(strCh6));
 
-				m_currentSet_List.SetItemText(0, 2, AvoidLarge(kCh0) + _T(" -") + AvoidLarge(bCh0));
-				m_currentSet_List.SetItemText(1, 2, AvoidLarge(kCh1) + _T(" -") + AvoidLarge(bCh1));
-				m_currentSet_List.SetItemText(2, 2, AvoidLarge(kCh2) + _T(" -") + AvoidLarge(bCh2));
-				m_currentSet_List.SetItemText(3, 2, AvoidLarge(kCh3) + _T(" -") + AvoidLarge(bCh3));
-				m_currentSet_List.SetItemText(4, 2, AvoidLarge(kCh4) + _T(" -") + AvoidLarge(bCh4));
-				m_currentSet_List.SetItemText(5, 2, AvoidLarge(kCh5) + _T(" -") + AvoidLarge(bCh5));
-				m_currentSet_List.SetItemText(6, 2, AvoidLarge(kCh6) + _T(" -") + AvoidLarge(bCh6));
+				if (m_Check1)
+					m_currentSet_List.SetItemText(0, 2, AvoidLarge(kCh0) + _T(" -") + AvoidLarge(bCh0));
+				if (m_Check2)
+					m_currentSet_List.SetItemText(1, 2, AvoidLarge(kCh1) + _T(" -") + AvoidLarge(bCh1));
+				if (m_Check3)
+					m_currentSet_List.SetItemText(2, 2, AvoidLarge(kCh2) + _T(" -") + AvoidLarge(bCh2));
+				if (m_Check4)
+					m_currentSet_List.SetItemText(3, 2, AvoidLarge(kCh3) + _T(" -") + AvoidLarge(bCh3));
+				if (m_Check5)
+					m_currentSet_List.SetItemText(4, 2, AvoidLarge(kCh4) + _T(" -") + AvoidLarge(bCh4));
+				if (m_Check6)
+					m_currentSet_List.SetItemText(5, 2, AvoidLarge(kCh5) + _T(" -") + AvoidLarge(bCh5));
+				if (m_Check7)
+					m_currentSet_List.SetItemText(6, 2, AvoidLarge(kCh6) + _T(" -") + AvoidLarge(bCh6));
 			}
 			int wode = 1;
 
@@ -1709,14 +2136,20 @@ void CToolDlg::OnBnClickedButtonCal()
 				bTCh5.Format(_T("%.4f"), (CURRENTVALUE1 - atof(kTCh5) * atof(strCh5)));
 				bTCh6.Format(_T("%.4f"), (CURRENTVALUE1 - atof(kTCh6) * atof(strCh6)));
 
-
-				m_currentSet_List.SetItemText(0, 3, AvoidLarge(kTCh0) + _T(" ") + AvoidLarge(bTCh0));
-				m_currentSet_List.SetItemText(1, 3, AvoidLarge(kTCh1) + _T(" ") + AvoidLarge(bTCh1));
-				m_currentSet_List.SetItemText(2, 3, AvoidLarge(kTCh2) + _T(" ") + AvoidLarge(bTCh2));
-				m_currentSet_List.SetItemText(3, 3, AvoidLarge(kTCh3) + _T(" ") + AvoidLarge(bTCh3));
-				m_currentSet_List.SetItemText(4, 3, AvoidLarge(kTCh4) + _T(" ") + AvoidLarge(bTCh4));
-				m_currentSet_List.SetItemText(5, 3, AvoidLarge(kTCh5) + _T(" ") + AvoidLarge(bTCh5));
-				m_currentSet_List.SetItemText(6, 3, AvoidLarge(kTCh6) + _T(" ") + AvoidLarge(bTCh6));
+				if (m_Check1)
+					m_currentSet_List.SetItemText(0, 3, AvoidLarge(kTCh0) + _T(" ") + AvoidLarge(bTCh0));
+				if (m_Check2)
+					m_currentSet_List.SetItemText(1, 3, AvoidLarge(kTCh1) + _T(" ") + AvoidLarge(bTCh1));
+				if (m_Check3)
+					m_currentSet_List.SetItemText(2, 3, AvoidLarge(kTCh2) + _T(" ") + AvoidLarge(bTCh2));
+				if (m_Check4)
+					m_currentSet_List.SetItemText(3, 3, AvoidLarge(kTCh3) + _T(" ") + AvoidLarge(bTCh3));
+				if (m_Check5)
+					m_currentSet_List.SetItemText(4, 3, AvoidLarge(kTCh4) + _T(" ") + AvoidLarge(bTCh4));
+				if (m_Check6)
+					m_currentSet_List.SetItemText(5, 3, AvoidLarge(kTCh5) + _T(" ") + AvoidLarge(bTCh5));
+				if (m_Check7)
+					m_currentSet_List.SetItemText(6, 3, AvoidLarge(kTCh6) + _T(" ") + AvoidLarge(bTCh6));
 			}
 		}
 	}
@@ -1985,6 +2418,7 @@ LRESULT CToolDlg::OrderMessage(WPARAM wParam, LPARAM lParam)
 	{
 		//处理用户自定义消息
 		CString str((LPCTSTR)lParam);
+
 		str += "\r\n";
 		m_SerialPort.WriteToPort(str.GetBuffer(str.GetLength()));
 
@@ -2599,7 +3033,7 @@ void CToolDlg::OnNMClickListCurrent(NMHDR* pNMHDR, LRESULT* pResult)
 	// TODO: 在此添加控件通知处理程序代码
 	CString tem;
 	m_CurrentEdit.GetWindowText(tem); //得到用户输入的新的内容
-
+	
 	m_currentSet_List.SetItemText(m_Row, m_Col, tem); //设置编辑框的新内容
 	m_CurrentEdit.ShowWindow(SW_HIDE); //隐藏编辑框
 
@@ -2761,7 +3195,10 @@ void CToolDlg::OnMenuSetDefault()
 	// TODO: 在此添加命令处理程序代码
 	if (m_Connected)
 	{
-		SetTimer(1, 50, 0);
+		CString order1 = _T(">ADMIN\r\n");
+
+		m_SerialPort.WriteToPort(order1.GetBuffer(order1.GetLength()));
+		SetTimer(1, 1000, 0);
 	}
 }
 
@@ -2777,7 +3214,7 @@ void CToolDlg::OnMenuSaveCache()
 }
 
 
-void CToolDlg::OnMenuClearReceive()
+void CToolDlg::OnMenuClearReceive()	
 {
 	// TODO: 在此添加命令处理程序代码
 	m_CtrRichEdit.SetSel(0, -1);
@@ -2794,4 +3231,12 @@ void CToolDlg::OnMenuAboutDlg()
 	nRes = aboutDlg.DoModal();  // 弹出对话框   
 	if (IDCANCEL == nRes)     // 判断对话框退出后返回值是否为IDCANCEL，如果是则return，否则继续向下执行   
 		return;   
+}
+
+
+void CToolDlg::OnBnClickedButton3()
+{
+	// TODO: 在此添加控件通知处理程序代码
+	ShellExecute(NULL, _T("open"), _T(".\\USER升级程序\\FileRead.exe"), NULL, NULL, SW_SHOWNORMAL);// 下划线的地方可以是网址或者是文件夹的位置，亦或者是文件的路径。
+
 }

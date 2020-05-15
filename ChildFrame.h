@@ -32,7 +32,9 @@ public:
 	afx_msg void OnStnClickedMfcpropertygridOrder();
 	void str2hex(CString str, char* hex); // 这个函数可能需要更改长度;
 	//10进制转16进制字符串
-	CString int10ToStr16(LONGLONG a);
+	CString int10ToStr16(LONGLONG num);
+	//10进制转16进制字符串,flag对应是否进位fla=1进位，0不进位
+	CString int10ToStr16(LONGLONG num,int flag);
 	//将如“66 03 ...”形式的字符串以空格为间隔转换为对应的16进制数并存放在BYTE型数组里
 	int HexStrToHex(CString str, BYTE* data);
 	//HexChar函数的功能是将16进制字符由ASCII码转为相应大小的16进制数

@@ -218,6 +218,9 @@ void COrderEdit::OnBnClickedButton20()
 	//将命令框中的命令字符串形式发送出去
 	::SendMessage(this->GetParent()->m_hWnd, WM_ORDERMESSAGE, WPARAM(TRUE) ,(LPARAM)(LPCTSTR)str);
 	str.ReleaseBuffer();
+
+
+
 }
 
 BOOL COrderEdit::ReadWndPosition()

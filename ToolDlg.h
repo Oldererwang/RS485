@@ -54,6 +54,8 @@ protected:
 	int m_Row;	//listcurrentset行
 	int m_Col;	//listcurrentset列
 
+	int unknow;
+
 	// 实现
 protected:
 	HICON m_hIcon;
@@ -184,4 +186,5 @@ public:
 	afx_msg void OnMenuSaveCache();
 	afx_msg void OnMenuClearReceive();
 	afx_msg void OnMenuAboutDlg();
+	afx_msg void OnBnClickedButton3();
 };

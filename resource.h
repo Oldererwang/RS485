@@ -1,6 +1,6 @@
 //{{NO_DEPENDENCIES}}
-// Microsoft Visual C++ generated include file.
-// Used by SerialPortTool.rc
+// Microsoft Visual C++ 生成的包含文件。
+// 供 SerialPortTool.rc 使用
 //
 #define IDD_SERIALPORTTOOL_DIALOG       102
 #define IDR_MAINFRAME                   128
