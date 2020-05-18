@@ -1,6 +1,6 @@
 //{{NO_DEPENDENCIES}}
-// Microsoft Visual C++ 生成的包含文件。
-// 供 SerialPortTool.rc 使用
+// Microsoft Visual C++ generated include file.
+// Used by SerialPortTool.rc
 //
 #define IDD_SERIALPORTTOOL_DIALOG       102
 #define IDR_MAINFRAME                   128
@@ -94,6 +94,11 @@
 #define SetTimeSendBtn                  1106
 #define TimeEdit                        1107
 #define IDC_MFCMENUBUTTON1              1108
+#define IDC_STATIC1                     1110
+#define IDC_STATIC2                     1111
+#define IDC_STATIC3                     1112
+#define AutoCalMod                      1114
+#define AutoCalBtn                      1115
 #define ID_MENU_WEQWE                   32771
 #define ID_32772                        32772
 #define ID_32773                        32773
@@ -109,9 +114,9 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        140
+#define _APS_NEXT_RESOURCE_VALUE        141
 #define _APS_NEXT_COMMAND_VALUE         32781
-#define _APS_NEXT_CONTROL_VALUE         1109
+#define _APS_NEXT_CONTROL_VALUE         1116
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

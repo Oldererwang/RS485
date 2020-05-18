@@ -15,6 +15,7 @@ CChildFrame::CChildFrame(CWnd* pParent /*=NULL*/)
 	: CDialogEx(CChildFrame::IDD, pParent)
 {
 	m_Connected = 0;
+
 }
 
 CChildFrame::~CChildFrame()
@@ -223,10 +224,6 @@ void CChildFrame::OnStnClickedMfcpropertygridOrder()
 
 	if ( "0xC00055AA" == str1 )	//第一种校验和计算C0
 	{
-		m_propertyGrid.GetProperty(3)->AllowEdit(false);
-		m_propertyGrid.GetProperty(4)->AllowEdit(false);
-		m_propertyGrid.GetProperty(5)->AllowEdit(false);
-
 		m_propertyGrid.GetProperty(3)->SetName(_T("预留"));
 		m_propertyGrid.GetProperty(4)->SetName(_T("预留"));
 		m_propertyGrid.GetProperty(5)->SetName(_T("预留"));
@@ -259,11 +256,6 @@ void CChildFrame::OnStnClickedMfcpropertygridOrder()
 	}
 	if ("0xC10055AA" == str1)	//C1
 	{
-
-		m_propertyGrid.GetProperty(3)->AllowEdit(true);
-		m_propertyGrid.GetProperty(4)->AllowEdit(false);
-		m_propertyGrid.GetProperty(5)->AllowEdit(false);
-
 		m_propertyGrid.GetProperty(3)->SetName(_T("设置采样时间"));
 		m_propertyGrid.GetProperty(4)->SetName(_T("预留"));
 		m_propertyGrid.GetProperty(5)->SetName(_T("预留"));
@@ -296,10 +288,6 @@ void CChildFrame::OnStnClickedMfcpropertygridOrder()
 
 	if ( "0xC20055AA" == str1 )
 	{
-		m_propertyGrid.GetProperty(3)->AllowEdit(true);
-		m_propertyGrid.GetProperty(4)->AllowEdit(true);
-		m_propertyGrid.GetProperty(5)->AllowEdit(false);
-
 		m_propertyGrid.GetProperty(3)->SetName(_T("设置年月日"));
 		m_propertyGrid.GetProperty(4)->SetName(_T("设置时分秒"));
 		m_propertyGrid.GetProperty(5)->SetName(_T("预留"));
@@ -356,6 +344,25 @@ void CChildFrame::OnStnClickedMfcpropertygridOrder()
 		pSelected->SetValue(str);
 
 	}
+
+	if ( "0xC30055AA" == str1 )
+	{
+
+		m_propertyGrid.GetProperty(3)->SetName(_T("预留"));
+		m_propertyGrid.GetProperty(4)->SetName(_T("预留"));
+		m_propertyGrid.GetProperty(5)->SetName(_T("预留"));
+
+	}
+
+	if ( "0xC40055AA" == str1 )
+	{
+
+		m_propertyGrid.GetProperty(3)->SetName(_T("预留"));
+		m_propertyGrid.GetProperty(4)->SetName(_T("预留"));
+		m_propertyGrid.GetProperty(5)->SetName(_T("预留"));
+
+	}
+
 
 }
 

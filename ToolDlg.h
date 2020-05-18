@@ -14,7 +14,6 @@
 #include "ChildFrame.h"
 
 class COrderEdit;
-static CString m_MyData;
 static CString m_Add("");
 static int dataNum =0;
 
@@ -30,7 +29,11 @@ public:
 	CFont m_firstFont;
 	CString cboStr;	//得到波特率进行判断
 
+	CMenu pMenu;
+
 	bool m_Connected;
+	bool isAdmin;
+	int mydateInt;	//电流校准系数个数
 
 	// 对话框数据
 	enum { IDD = IDD_SERIALPORTTOOL_DIALOG };
@@ -55,6 +58,8 @@ protected:
 	int m_Col;	//listcurrentset列
 
 	int unknow;
+
+	int autoSetFlag;//自动计算系数timer
 
 	// 实现
 protected:
@@ -176,15 +181,17 @@ protected:
 	afx_msg LRESULT OnTochildMessage(WPARAM wParam, LPARAM lParam);
 
 public:
-	afx_msg void On32772();
+	afx_msg void OnMenuModel();
 	afx_msg void OnMenuCOrder();
 	afx_msg void OnMenuBOrder();
 	afx_msg void OnTimeSet();
 	afx_msg void OnMenuShowState();
 	afx_msg void OnMenuOrder();
 	afx_msg void OnMenuSetDefault();
+	afx_msg void OnMenuSetCurr();
 	afx_msg void OnMenuSaveCache();
 	afx_msg void OnMenuClearReceive();
 	afx_msg void OnMenuAboutDlg();
 	afx_msg void OnBnClickedButton3();
+
 };

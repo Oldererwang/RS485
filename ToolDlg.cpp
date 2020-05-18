@@ -31,6 +31,7 @@ CToolDlg::CToolDlg(CWnd* pParent /*=NULL*/)
 	, m_StrRichEdit(_T(""))
 {
 	//初始化
+	mydateInt = 0;
 	m_StrSendData = _T("");
 	m_StrRichEdit = _T("");
 	m_bHexReceive = FALSE;
@@ -39,11 +40,13 @@ CToolDlg::CToolDlg(CWnd* pParent /*=NULL*/)
 	m_uReceiveBytes = 0;
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 	m_Connected = 0;	//表明串口连接未连接
+	isAdmin = 0;		//表明不在管理员模式
 	m_iRxLen = 0;		//初始化串口缓冲数组长度
 	endFLag = 0;
 	dfInt = 0;
 	orderFlag = -1;
 	unknow = 0;
+	autoSetFlag = 0;
 
 	for (int i = 0; i < 2048; ++i)
 	{
@@ -125,13 +128,13 @@ BEGIN_MESSAGE_MAP(CToolDlg, CDialog)
 	ON_NOTIFY(NM_CLICK, IDC_LIST4, &CToolDlg::OnNMClickListCurrent)
 
 	ON_WM_DESTROY()
-
-	ON_COMMAND(ID_32772, &CToolDlg::On32772)
+	ON_COMMAND(1,&CToolDlg::OnMenuModel)
 	ON_COMMAND(ID_32776, &CToolDlg::OnMenuCOrder)
 	ON_COMMAND(ID_32777, &CToolDlg::OnMenuBOrder)
 	ON_COMMAND(ID_32774, &CToolDlg::OnTimeSet)
 	ON_COMMAND(ID_32775, &CToolDlg::OnMenuShowState)
 	ON_COMMAND(4, &CToolDlg::OnMenuOrder)
+	ON_COMMAND(6, &CToolDlg::OnMenuSetCurr)
 	ON_COMMAND(ID_32778, &CToolDlg::OnMenuSetDefault)
 	ON_COMMAND(ID_32779, &CToolDlg::OnMenuSaveCache)
 	ON_COMMAND(ID_32780, &CToolDlg::OnMenuClearReceive)
@@ -152,9 +155,9 @@ BOOL CToolDlg::OnInitDialog()
 	SetIcon(m_hIcon, FALSE);		// 设置小图标
 
 	/*这一部分是menu菜单*/
-	CMenu* pMenu = new CMenu;
-	pMenu->LoadMenu(IDR_MENU1); //载入菜单资源
-	SetMenu(pMenu);
+	pMenu.LoadMenu(IDR_MENU1); //载入菜单资源
+	SetMenu(&pMenu);
+
 
 	ReadWndPosition();		//载入窗口位置
 
@@ -329,6 +332,36 @@ BOOL CToolDlg::OnInitDialog()
 	orderEditDlg = new COrderEdit;
 	orderEditDlg->Create(IDD_EDIT_DIALOG, this);
 	orderEditDlg->SetWindowPos(&CWnd::wndTop, (rt1.right), rt3.top - 20, 0, 0, SWP_NOSIZE);	//设置子窗口位置
+
+	/************************************************************************/
+	/* 这一部分是隐藏用户模式下的控件                                                                     */
+	/************************************************************************/
+	if (!isAdmin)
+	{
+		GetDlgItem(EditIP1)->ShowWindow(SW_HIDE);
+		GetDlgItem(EditIp2)->ShowWindow(SW_HIDE);
+		GetDlgItem(EditIP3)->ShowWindow(SW_HIDE);
+		GetDlgItem(EditIP4)->ShowWindow(SW_HIDE);
+		GetDlgItem(IDC_STATIC1)->ShowWindow(SW_HIDE);
+		GetDlgItem(IDC_STATIC2)->ShowWindow(SW_HIDE);
+		GetDlgItem(IDC_STATIC3)->ShowWindow(SW_HIDE);
+		GetDlgItem(setIpBtn)->ShowWindow(SW_HIDE);
+		GetDlgItem(IDC_EDITPort)->ShowWindow(SW_HIDE);
+		GetDlgItem(setPortBtn)->ShowWindow(SW_HIDE);
+		GetDlgItem(IDC_CHECK1)->ShowWindow(SW_HIDE);
+		GetDlgItem(IDC_CHECK2)->ShowWindow(SW_HIDE);
+		GetDlgItem(IDC_CHECK3)->ShowWindow(SW_HIDE);
+		GetDlgItem(IDC_CHECK4)->ShowWindow(SW_HIDE);
+		GetDlgItem(IDC_CHECK5)->ShowWindow(SW_HIDE);
+		GetDlgItem(IDC_CHECK6)->ShowWindow(SW_HIDE);
+		GetDlgItem(IDC_CHECK7)->ShowWindow(SW_HIDE);
+		GetDlgItem(IDC_BUTTON1)->ShowWindow(SW_HIDE);
+		GetDlgItem(IDC_COMBO2)->ShowWindow(SW_HIDE);
+		GetDlgItem(IDC_BUTTON_Cal)->ShowWindow(SW_HIDE);
+		GetDlgItem(IDC_BUTTON_SET)->ShowWindow(SW_HIDE);
+
+	}
+
 
 	//编辑框指定文本
 	orderEditDlg->SetDlgItemText(IDC_EDIT1, ">DEVICE_ID:ZTZN0001");
@@ -620,6 +653,9 @@ void CToolDlg::OnBnClickedBtnOpenPort()	//打开串口
 				//MessageBox(_T(" 成功打开串口！"),_T("提示"));
 				m_Connected = 1;
 
+				CString order1 = _T(">USER\r\n");
+				m_SerialPort.WriteToPort(order1.GetBuffer(order1.GetLength()));
+
 				//发送消息给B类
 				::SendMessage(m_ChildFrame->GetSafeHwnd(), WM_CHILDMESSAGE, WPARAM(m_Connected), 0);
 			}
@@ -642,6 +678,34 @@ void CToolDlg::OnBnClickedBtnOpenPort()	//打开串口
 	{
 		if (m_Connected)
 		{
+
+			isAdmin = 0;
+			pMenu.ModifyMenu(0,MF_BYPOSITION,1, "当前为用户模式  ");
+			
+			AfxGetMainWnd()->DrawMenuBar();
+
+			GetDlgItem(EditIP1)->ShowWindow(SW_HIDE);
+			GetDlgItem(EditIp2)->ShowWindow(SW_HIDE);
+			GetDlgItem(EditIP3)->ShowWindow(SW_HIDE);
+			GetDlgItem(EditIP4)->ShowWindow(SW_HIDE);
+			GetDlgItem(IDC_STATIC1)->ShowWindow(SW_HIDE);
+			GetDlgItem(IDC_STATIC2)->ShowWindow(SW_HIDE);
+			GetDlgItem(IDC_STATIC3)->ShowWindow(SW_HIDE);
+			GetDlgItem(setIpBtn)->ShowWindow(SW_HIDE);
+			GetDlgItem(IDC_EDITPort)->ShowWindow(SW_HIDE);
+			GetDlgItem(setPortBtn)->ShowWindow(SW_HIDE);
+			GetDlgItem(IDC_CHECK1)->ShowWindow(SW_HIDE);
+			GetDlgItem(IDC_CHECK2)->ShowWindow(SW_HIDE);
+			GetDlgItem(IDC_CHECK3)->ShowWindow(SW_HIDE);
+			GetDlgItem(IDC_CHECK4)->ShowWindow(SW_HIDE);
+			GetDlgItem(IDC_CHECK5)->ShowWindow(SW_HIDE);
+			GetDlgItem(IDC_CHECK6)->ShowWindow(SW_HIDE);
+			GetDlgItem(IDC_CHECK7)->ShowWindow(SW_HIDE);
+			GetDlgItem(IDC_COMBO2)->ShowWindow(SW_HIDE);
+			GetDlgItem(IDC_BUTTON_Cal)->ShowWindow(SW_HIDE);
+			GetDlgItem(IDC_BUTTON_SET)->ShowWindow(SW_HIDE);
+			GetDlgItem(IDC_BUTTON1)->ShowWindow(SW_HIDE);
+
 			SetDlgItemText(IDC_BTN_OPEN_CLOSE_PORT, _T("打开串口"));
 			GetDlgItem(IDC_CBO_SERIAL_PORT)->EnableWindow(TRUE);
 			GetDlgItem(IDC_CBO_BAUD_RATE)->EnableWindow(TRUE);
@@ -688,29 +752,80 @@ void CToolDlg::OnTimer(UINT_PTR nIDEvent)
 	// TODO: 在此添加消息处理程序代码和/或调用默认值
 
 	switch (nIDEvent)		//nIDEvent 为定时器事件ID，1，2，3  
-	{
-	case 1:
-	{
-		CString cStr, order;
-		cStr.Format("%d", dfInt);
-		if (dfInt < 8)
+	{		
+	case 1:			//自动设置默认系数
 		{
-			if (dfInt != 7)
+			CString cStr, order;
+			cStr.Format("%d", dfInt);
+			if (dfInt < 7)
 			{
 				order = _T(">CALIB[") + _T(cStr) + _T("]:10000|+0000|10000|+0000|10000\r\n");
 			}
-			else
-				order = _T(">USER\r\n");
+			m_SerialPort.WriteToPort(order.GetBuffer(order.GetLength()));
+			dfInt++;
+			if (7 == dfInt)
+			{
+				dfInt = 0;
+				KillTimer(1);
+			}
+			break;
 		}
-		m_SerialPort.WriteToPort(order.GetBuffer(order.GetLength()));
-		dfInt++;
-		if (8 == dfInt)
+
+	case 2:			//自动设置当前系数
 		{
-			dfInt = 0;
-			KillTimer(1);
+			if (m_currentSet_List.GetItemText(0, 3) != "")	//判断有电流系数时才做校准
+			{
+				if (autoSetFlag < 7)
+				{
+					CString kCh, bCh, kTCh, bTCh;
+					int i0 = 0;
+					while ((m_currentSet_List.GetItemText(autoSetFlag, 2)).Mid(i0, 1) != " ")
+						i0++;
+
+					kCh = (m_currentSet_List.GetItemText(autoSetFlag, 2)).Mid(0, i0);		//将3.5A时候的k解析出来(4位）
+					float f1 = _tstof(kCh);
+					kCh.Format("%.4f", f1);
+
+					bCh = (m_currentSet_List.GetItemText(autoSetFlag, 2));
+					bCh.Delete(0, i0 + 1);
+
+					while ((m_currentSet_List.GetItemText(autoSetFlag, 3)).Mid(i0, 1) != " ")
+						i0++;
+					kTCh = (m_currentSet_List.GetItemText(autoSetFlag, 3)).Mid(0, i0);		//将100A时候的k解析出来
+
+					float ff1 = _tstof(kTCh);
+					kTCh.Format("%.4f", ff1);
+
+					bTCh = (m_currentSet_List.GetItemText(autoSetFlag, 3));
+					bTCh.Delete(0, i0 + 1);
+
+					kCh = kDatatoOrder(kCh);//1.0000  1.000
+					kTCh = kDatatoOrder(kTCh);
+					bCh = bDatatoOrder(bCh);
+					bTCh = bDatatoOrder(bTCh);
+
+					CString cStr;
+					cStr.Format("%d", autoSetFlag);
+					CString order = _T(">CALIB[") + cStr + _T("]:") + kCh + "|" + bCh + "|" + kTCh + "|" + bTCh + _T("|10000\r\n" );
+					m_SerialPort.WriteToPort(order.GetBuffer(order.GetLength()));				
+				}
+				autoSetFlag++;
+				if (8 == autoSetFlag)
+				{
+					autoSetFlag = 0;
+
+					CString order = _T(">SAVE\r\n" );
+					m_SerialPort.WriteToPort(order.GetBuffer(order.GetLength()));
+					KillTimer(2);
+				}
+				
+			}			
+			else
+			{
+				KillTimer(2);
+			}
+			break;
 		}
-	}
-	break;
 
 	}
 	CDialog::OnTimer(nIDEvent);
@@ -721,7 +836,7 @@ LPARAM CToolDlg::OnComm(WPARAM ch, LPARAM port)
 	UpdateData(true);
 	/************************************************************************/
 	/* B类数据结构解析                                                         */
-	/************************************************************************/
+	/************************************************************************/	
 	if (_T("57600") == cboStr)
 	{
 		CString strTemp; 
@@ -1365,6 +1480,7 @@ LPARAM CToolDlg::OnComm(WPARAM ch, LPARAM port)
 		if ((m_RxData[m_iRxLen - 2] == '\r' && m_RxData[m_iRxLen - 1] == '\n'))
 		{
 			CString mLeft4 = msgNotice.Left(4);
+			CString mLeft9 = msgNotice.Left(9);
 
 			if ("设置" != mLeft4)
 			{
@@ -1377,8 +1493,7 @@ LPARAM CToolDlg::OnComm(WPARAM ch, LPARAM port)
 				m_CtrRichEdit.SetSel(-1, -1);
 				m_CtrRichEdit.ReplaceSel(mstr1);
 			}
-
-			if ("设置" == mLeft4 || "状态" == mLeft4 || "保存" == mLeft4)
+			if ("设置" == mLeft4 || "状态" == mLeft4 || "保存" == mLeft4 || "进入" == mLeft4)
 			{
 				CString mTemp;
 				for (int i = 0; i < m_iRxLen; i++)
@@ -1400,67 +1515,43 @@ LPARAM CToolDlg::OnComm(WPARAM ch, LPARAM port)
 
 			}
 
-			if ("校准" == mLeft4 || msgNotice.Mid(0, 3) == "a1=")
+			if ("校准系数:" == mLeft9 || (msgNotice.Mid(0, 3) == "a1="))
 			{
 				//初始化电流校准系数
-				CString mydata = LookChildString(msgNotice);
-				m_MyData += mydata;
-				dataNum++;
-
-				if (8 == dataNum)
+				if ("校准系数:" == mLeft9)
 				{
-					dataNum = 0;
-					CStringArray strArr;
-
-					while (m_MyData.Find(_T(" ")) > 0)
-					{
-						int findSpace = m_MyData.Find(_T(" "));
-
-						strArr.Add(m_MyData.Left(findSpace));
-						m_MyData.Delete(0, findSpace + 1);
-					}
-
-					int arrSize = strArr.GetSize();
-
-					CString count;
-					count.Format(_T("%d"), arrSize);
-					//MessageBox(count, _T(""), MB_OK);
-					//MessageBox(strArr.GetAt(0), _T(""), MB_OK);
-
-					for (int i = 0; i < arrSize; i++)
-					{
-						if (strArr.GetAt(i).Find("\r\n") > 0)
-						{
-							int findN = strArr[i].Find("\r\n");
-							strArr[i].Delete(0, findN + 2);
-						}
-						strArr[i] = strArr[i].Left(6);
-					}
-
-					m_currentSet_List.SetItemText(0, 1, _T(strArr[1]));//1 5 9 13 17 21 25
-					m_currentSet_List.SetItemText(1, 1, _T(strArr[5]));
-					m_currentSet_List.SetItemText(2, 1, _T(strArr[9]));
-					m_currentSet_List.SetItemText(3, 1, _T(strArr[13]));
-					m_currentSet_List.SetItemText(4, 1, _T(strArr[17]));
-					m_currentSet_List.SetItemText(5, 1, _T(strArr[21]));
-					m_currentSet_List.SetItemText(6, 1, _T(strArr[25]));
-
-					m_currentSet_List.SetItemText(0, 2, _T(strArr[0]) + " " + strArr[1]);
-					m_currentSet_List.SetItemText(1, 2, _T(strArr[4]) + " " + strArr[5]);
-					m_currentSet_List.SetItemText(2, 2, _T(strArr[8]) + " " + strArr[9]);
-					m_currentSet_List.SetItemText(3, 2, _T(strArr[12]) + " " + strArr[13]);
-					m_currentSet_List.SetItemText(4, 2, _T(strArr[16]) + " " + strArr[17]);
-					m_currentSet_List.SetItemText(5, 2, _T(strArr[20]) + " " + strArr[21]);
-					m_currentSet_List.SetItemText(6, 2, _T(strArr[24]) + " " + strArr[25]);
-
-					m_currentSet_List.SetItemText(0, 3, _T(strArr[2]) + " " + strArr[3]);
-					m_currentSet_List.SetItemText(1, 3, _T(strArr[6]) + " " + strArr[7]);
-					m_currentSet_List.SetItemText(2, 3, _T(strArr[10]) + " " + strArr[11]);
-					m_currentSet_List.SetItemText(3, 3, _T(strArr[14]) + " " + strArr[15]);
-					m_currentSet_List.SetItemText(4, 3, _T(strArr[18]) + " " + strArr[19]);
-					m_currentSet_List.SetItemText(5, 3, _T(strArr[22]) + " " + strArr[23]);
-					m_currentSet_List.SetItemText(6, 3, _T(strArr[26]) + " " + strArr[27]);
+					mydateInt = 0;
 				}
+
+				CString mydata = LookChildString(msgNotice);
+
+				CStringArray strArr;
+				while (mydata.Find(_T(" ")) > 0)
+				{
+					int findSpace = mydata.Find(_T(" "));
+
+					strArr.Add(mydata.Left(findSpace));
+					mydata.Delete(0, findSpace + 1);
+				}
+				int arrSize = strArr.GetSize();
+
+				CString count;
+				count.Format(_T("%d"), arrSize);
+				for (int i = 0; i < arrSize; i++)
+				{
+					if (strArr.GetAt(i).Find("\r\n") > 0)
+					{
+						int findN = strArr[i].Find("\r\n");
+						strArr[i].Delete(0, findN + 2);
+					}
+					strArr[i] = strArr[i].Left(6);
+				}
+
+				m_currentSet_List.SetItemText(mydateInt, 1, _T(strArr[1]));
+				m_currentSet_List.SetItemText(mydateInt, 2, _T(strArr[0]) + " " + strArr[1]);
+				m_currentSet_List.SetItemText(mydateInt, 3, _T(strArr[2]) + " " + strArr[3]);
+
+				mydateInt++;
 
 				CString tempp = m_currentSet_List.GetItemText(m_Row, m_Col);
 				m_CurrentEdit.SetWindowTextA(tempp);
@@ -1800,7 +1891,7 @@ LPARAM CToolDlg::OnComm(WPARAM ch, LPARAM port)
 
 			int nline = m_CtrRichEdit.GetLineCount();
 
-			if (nline > 10000)
+			if (nline > 1000)
 			{
 				UpdateData(TRUE);
 				m_StrSendData = _T("");			//清空编辑区
@@ -1811,7 +1902,6 @@ LPARAM CToolDlg::OnComm(WPARAM ch, LPARAM port)
 			m_CtrRichEdit.PostMessage(WM_VSCROLL, SB_BOTTOM, 0);
 		}
 	}
-
 	return 0;
 }
 
@@ -2008,8 +2098,13 @@ CString CToolDlg::hexCharToNumber(char HexChar)
 
 void CToolDlg::OnBnClickedButtonCal()
 {	// TODO: 在此添加控件通知处理程序代码
-	if (m_Connected)
+	if (isAdmin)
 	{
+		CString order(_T(">SHOW_CURR\r\n"));
+		m_SerialPort.WriteToPort(order.GetBuffer(order.GetLength()));
+
+		m_CtrRichEdit.ReplaceSel("\r\n");
+
 		if (m_ListCurrent.GetItemText(0, 1) != "")	//判断电流有数据时才做计算
 		{
 			//得到m_ListCurrent上的电流值
@@ -2032,13 +2127,20 @@ void CToolDlg::OnBnClickedButtonCal()
 				bCh5.Format(_T("%.4f"), atof(strCh5));
 				bCh6.Format(_T("%.4f"), atof(strCh6));
 
-				m_currentSet_List.SetItemText(0, 1, AvoidLarge(bCh0));
-				m_currentSet_List.SetItemText(1, 1, AvoidLarge(bCh1));
-				m_currentSet_List.SetItemText(2, 1, AvoidLarge(bCh2));
-				m_currentSet_List.SetItemText(3, 1, AvoidLarge(bCh3));
-				m_currentSet_List.SetItemText(4, 1, AvoidLarge(bCh4));
-				m_currentSet_List.SetItemText(5, 1, AvoidLarge(bCh5));
-				m_currentSet_List.SetItemText(6, 1, AvoidLarge(bCh6));
+				if (m_Check1)
+					m_currentSet_List.SetItemText(0, 1, AvoidLarge(bCh0));
+				if (m_Check2)
+					m_currentSet_List.SetItemText(1, 1, AvoidLarge(bCh1));
+				if (m_Check3)
+					m_currentSet_List.SetItemText(2, 1, AvoidLarge(bCh2));
+				if (m_Check4)
+					m_currentSet_List.SetItemText(3, 1, AvoidLarge(bCh3));
+				if (m_Check5)
+					m_currentSet_List.SetItemText(4, 1, AvoidLarge(bCh4));
+				if (m_Check6)
+					m_currentSet_List.SetItemText(5, 1, AvoidLarge(bCh5));
+				if (m_Check7)
+					m_currentSet_List.SetItemText(6, 1, AvoidLarge(bCh6));
 			}
 
 			if (1 == m_cboCurrent.GetCurSel())		//当电流为3.5A时
@@ -2081,8 +2183,9 @@ void CToolDlg::OnBnClickedButtonCal()
 			{
 				CString kCh0, kCh1, kCh2, kCh3, kCh4, kCh5, kCh6;						//3.5A时的k值
 				CString kTCh0, kTCh1, kTCh2, kTCh3, kTCh4, kTCh5, kTCh6;				//100A时的k值
-				CString bTCh0, bTCh1, bTCh2, bTCh3, bTCh4, bTCh5, bTCh6;				//100A时的b值
+				CString bTCh0, bTCh1, bTCh2, bTCh3, bTCh4, bTCh5, bTCh6;				//100A时的b值							
 				CString curCh0, curCh1, curCh2, curCh3, curCh4, curCh5, curCh6;		//3.5A时电流值
+		
 				int i0 = 0;
 				int i1 = 0;
 				int i2 = 0;
@@ -2090,21 +2193,59 @@ void CToolDlg::OnBnClickedButtonCal()
 				int i4 = 0;
 				int i5 = 0;
 				int i6 = 0;
-				while ((m_currentSet_List.GetItemText(0, 2)).Mid(i0, 1) != " ")
-					i0++;
-				while ((m_currentSet_List.GetItemText(1, 2)).Mid(i1, 1) != " ")
-					i1++;
-				while ((m_currentSet_List.GetItemText(2, 2)).Mid(i2, 1) != " ")
-					i2++;
-				while ((m_currentSet_List.GetItemText(3, 2)).Mid(i3, 1) != " ")
-					i3++;
-				while ((m_currentSet_List.GetItemText(4, 2)).Mid(i4, 1) != " ")
-					i4++;
-				while ((m_currentSet_List.GetItemText(5, 2)).Mid(i5, 1) != " ")
-					i5++;
-				while ((m_currentSet_List.GetItemText(6, 2)).Mid(i6, 1) != " ")
-					i6++;
-				kCh0 = (m_currentSet_List.GetItemText(0, 2)).Mid(0, i0);		//将3.5A时候的k解析出来
+
+				if (m_Check1)
+				{
+					while ((m_currentSet_List.GetItemText(0, 2)).Mid(i0, 1) != " ")
+						i0++;
+					kCh0 = (m_currentSet_List.GetItemText(0, 2)).Mid(0, i0);		//将3.5A时候的k解析出来
+					curCh0.Format(_T("%.4f"), CURRENTVALUE0 / atof(kCh0));					//3.5/k 即得到此时电流值x
+					kTCh0.Format(_T("%.3f"), (CURRENTVALUE1 - CURRENTVALUE0) / (atof(strCh0) - atof(curCh0)));		//求100A时k值 cstring
+					bTCh0.Format(_T("%.4f"), (CURRENTVALUE1 - atof(kTCh0) * atof(strCh0)));		//求100A时b值 cstring
+					m_currentSet_List.SetItemText(0, 3, AvoidLarge(kTCh0) + _T(" ") + AvoidLarge(bTCh0));
+
+				}
+
+				if (m_Check2)
+				{
+					while ((m_currentSet_List.GetItemText(1, 2)).Mid(i1, 1) != " ")
+						i1++;
+
+
+				}
+
+				if (m_Check3)
+				{
+					while ((m_currentSet_List.GetItemText(2, 2)).Mid(i2, 1) != " ")
+						i2++;
+				}
+
+
+				if (m_Check4)
+				{
+					while ((m_currentSet_List.GetItemText(3, 2)).Mid(i3, 1) != " ")
+						i3++;
+				}
+
+
+				if (m_Check5)
+				{
+					while ((m_currentSet_List.GetItemText(4, 2)).Mid(i4, 1) != " ")
+						i4++;
+				}
+
+				if (m_Check6)
+				{
+					while ((m_currentSet_List.GetItemText(5, 2)).Mid(i5, 1) != " ")
+						i5++;
+				}
+
+				if (m_Check7)
+				{
+					while ((m_currentSet_List.GetItemText(6, 2)).Mid(i6, 1) != " ")
+						i6++;
+				}
+
 				kCh1 = (m_currentSet_List.GetItemText(1, 2)).Mid(0, i1);
 				kCh2 = (m_currentSet_List.GetItemText(2, 2)).Mid(0, i2);
 				kCh3 = (m_currentSet_List.GetItemText(3, 2)).Mid(0, i3);
@@ -2112,7 +2253,6 @@ void CToolDlg::OnBnClickedButtonCal()
 				kCh5 = (m_currentSet_List.GetItemText(5, 2)).Mid(0, i5);
 				kCh6 = (m_currentSet_List.GetItemText(6, 2)).Mid(0, i6);
 
-				curCh0.Format(_T("%.4f"), CURRENTVALUE0 / atof(kCh0));					//3.5/k 即得到此时电流值x
 				curCh1.Format(_T("%.4f"), CURRENTVALUE0 / atof(kCh1));
 				curCh2.Format(_T("%.4f"), CURRENTVALUE0 / atof(kCh2));
 				curCh3.Format(_T("%.4f"), CURRENTVALUE0 / atof(kCh3));
@@ -2120,7 +2260,6 @@ void CToolDlg::OnBnClickedButtonCal()
 				curCh5.Format(_T("%.4f"), CURRENTVALUE0 / atof(kCh5));
 				curCh6.Format(_T("%.4f"), CURRENTVALUE0 / atof(kCh6));
 
-				kTCh0.Format(_T("%.3f"), (CURRENTVALUE1 - CURRENTVALUE0) / (atof(strCh0) - atof(curCh0)));		//求100A时k值 cstring
 				kTCh1.Format(_T("%.3f"), (CURRENTVALUE1 - CURRENTVALUE0) / (atof(strCh1) - atof(curCh1)));
 				kTCh2.Format(_T("%.3f"), (CURRENTVALUE1 - CURRENTVALUE0) / (atof(strCh2) - atof(curCh2)));
 				kTCh3.Format(_T("%.3f"), (CURRENTVALUE1 - CURRENTVALUE0) / (atof(strCh3) - atof(curCh3)));
@@ -2128,7 +2267,6 @@ void CToolDlg::OnBnClickedButtonCal()
 				kTCh5.Format(_T("%.3f"), (CURRENTVALUE1 - CURRENTVALUE0) / (atof(strCh5) - atof(curCh5)));
 				kTCh6.Format(_T("%.3f"), (CURRENTVALUE1 - CURRENTVALUE0) / (atof(strCh6) - atof(curCh6)));
 
-				bTCh0.Format(_T("%.4f"), (CURRENTVALUE1 - atof(kTCh0) * atof(strCh0)));		//求100A时b值 cstring
 				bTCh1.Format(_T("%.4f"), (CURRENTVALUE1 - atof(kTCh1) * atof(strCh1)));
 				bTCh2.Format(_T("%.4f"), (CURRENTVALUE1 - atof(kTCh2) * atof(strCh2)));
 				bTCh3.Format(_T("%.4f"), (CURRENTVALUE1 - atof(kTCh3) * atof(strCh3)));
@@ -2136,9 +2274,7 @@ void CToolDlg::OnBnClickedButtonCal()
 				bTCh5.Format(_T("%.4f"), (CURRENTVALUE1 - atof(kTCh5) * atof(strCh5)));
 				bTCh6.Format(_T("%.4f"), (CURRENTVALUE1 - atof(kTCh6) * atof(strCh6)));
 
-				if (m_Check1)
-					m_currentSet_List.SetItemText(0, 3, AvoidLarge(kTCh0) + _T(" ") + AvoidLarge(bTCh0));
-				if (m_Check2)
+			if (m_Check2)
 					m_currentSet_List.SetItemText(1, 3, AvoidLarge(kTCh1) + _T(" ") + AvoidLarge(bTCh1));
 				if (m_Check3)
 					m_currentSet_List.SetItemText(2, 3, AvoidLarge(kTCh2) + _T(" ") + AvoidLarge(bTCh2));
@@ -2441,6 +2577,7 @@ BOOL CToolDlg::OnDeviceChange(UINT nEventType, DWORD dwData)
 
 			m_SerialPort.ClosePort();
 			m_Connected = 0;
+			isAdmin = 0;
 		}
 		break;
 	}
@@ -3097,12 +3234,6 @@ afx_msg LRESULT CToolDlg::OnTochildMessage(WPARAM wParam, LPARAM lParam)
 }
 
 
-void CToolDlg::On32772()
-{
-	// TODO: 在此添加命令处理程序代码
-	ShellExecute(NULL, _T("open"), _T(".\\Defalut.ini"), NULL, NULL, SW_SHOWNORMAL);// 下划线的地方可以是网址或者是文件夹的位置，亦或者是文件的路径。
-}
-
 
 void CToolDlg::OnMenuCOrder()
 {
@@ -3123,6 +3254,7 @@ void CToolDlg::OnMenuCOrder()
 	GetDlgItem(IDC_CHECK5)->ShowWindow(SW_SHOW);
 	GetDlgItem(IDC_CHECK6)->ShowWindow(SW_SHOW);
 	GetDlgItem(IDC_CHECK7)->ShowWindow(SW_SHOW);
+
 }
 
 
@@ -3181,26 +3313,43 @@ void CToolDlg::OnMenuShowState()
 void CToolDlg::OnMenuOrder()
 {
 	// TODO: 在此添加命令处理程序代码
-	if (!orderEditDlg->IsWindowVisible())
+	if (!isAdmin)
 	{
-		orderEditDlg->ShowWindow(SW_SHOW);
-
+		
+		AfxMessageBox(_T("请打开管理员模式"));
 	}
 	else
-		orderEditDlg->ShowWindow(SW_HIDE);
+	{
+		if (!orderEditDlg->IsWindowVisible())
+		{
+			orderEditDlg->ShowWindow(SW_SHOW);
+
+		}
+		else
+			orderEditDlg->ShowWindow(SW_HIDE);
+	}
+
 }
 
 void CToolDlg::OnMenuSetDefault()
 {
 	// TODO: 在此添加命令处理程序代码
-	if (m_Connected)
+	if (isAdmin)
 	{
-		CString order1 = _T(">ADMIN\r\n");
-
-		m_SerialPort.WriteToPort(order1.GetBuffer(order1.GetLength()));
 		SetTimer(1, 1000, 0);
 	}
 }
+
+void CToolDlg::OnMenuSetCurr()
+{
+	// TODO: 在此添加命令处理程序代码
+	if (isAdmin)
+	{
+		SetTimer(2, 1000, 0);
+	}
+}
+
+
 
 
 void CToolDlg::OnMenuSaveCache()
@@ -3233,10 +3382,92 @@ void CToolDlg::OnMenuAboutDlg()
 		return;   
 }
 
+void CToolDlg::OnMenuModel()
+{
+	if (m_Connected)
+	{
+		CString tempStr;
+		pMenu.GetMenuStringA(0,tempStr,MF_BYPOSITION);
+
+		if (_T("当前为用户模式  ") == tempStr)
+		{
+			isAdmin = 1;
+			pMenu.ModifyMenu(0,MF_BYPOSITION,1, "当前为管理员模式");
+			AfxGetMainWnd()->DrawMenuBar();
+
+			GetDlgItem(IDC_BUTTON3)->ShowWindow(SW_SHOW);
+			GetDlgItem(EditIP1)->ShowWindow(SW_SHOW);
+			GetDlgItem(EditIp2)->ShowWindow(SW_SHOW);
+			GetDlgItem(EditIP3)->ShowWindow(SW_SHOW);
+			GetDlgItem(EditIP4)->ShowWindow(SW_SHOW);
+			GetDlgItem(IDC_STATIC1)->ShowWindow(SW_SHOW);
+			GetDlgItem(IDC_STATIC2)->ShowWindow(SW_SHOW);
+			GetDlgItem(IDC_STATIC3)->ShowWindow(SW_SHOW);
+			GetDlgItem(setIpBtn)->ShowWindow(SW_SHOW);
+			GetDlgItem(IDC_EDITPort)->ShowWindow(SW_SHOW);
+			GetDlgItem(setPortBtn)->ShowWindow(SW_SHOW);
+			GetDlgItem(IDC_CHECK1)->ShowWindow(SW_SHOW);
+			GetDlgItem(IDC_CHECK2)->ShowWindow(SW_SHOW);
+			GetDlgItem(IDC_CHECK3)->ShowWindow(SW_SHOW);
+			GetDlgItem(IDC_CHECK4)->ShowWindow(SW_SHOW);
+			GetDlgItem(IDC_CHECK5)->ShowWindow(SW_SHOW);
+			GetDlgItem(IDC_CHECK6)->ShowWindow(SW_SHOW);
+			GetDlgItem(IDC_CHECK7)->ShowWindow(SW_SHOW);
+			GetDlgItem(IDC_COMBO2)->ShowWindow(SW_SHOW);
+			GetDlgItem(IDC_BUTTON_Cal)->ShowWindow(SW_SHOW);
+			GetDlgItem(IDC_BUTTON_SET)->ShowWindow(SW_SHOW);
+			GetDlgItem(IDC_BUTTON1)->ShowWindow(SW_SHOW);
+
+			CString order1 = _T(">ADMIN\r\n");
+			m_SerialPort.WriteToPort(order1.GetBuffer(order1.GetLength()));
+
+		}
+		else if (_T("当前为管理员模式") == tempStr)
+		{
+			isAdmin = 0;
+			pMenu.ModifyMenu(0,MF_BYPOSITION,1, "当前为用户模式  ");
+			AfxGetMainWnd()->DrawMenuBar();
+
+			GetDlgItem(EditIP1)->ShowWindow(SW_HIDE);
+			GetDlgItem(EditIp2)->ShowWindow(SW_HIDE);
+			GetDlgItem(EditIP3)->ShowWindow(SW_HIDE);
+			GetDlgItem(EditIP4)->ShowWindow(SW_HIDE);
+			GetDlgItem(IDC_STATIC1)->ShowWindow(SW_HIDE);
+			GetDlgItem(IDC_STATIC2)->ShowWindow(SW_HIDE);
+			GetDlgItem(IDC_STATIC3)->ShowWindow(SW_HIDE);
+			GetDlgItem(setIpBtn)->ShowWindow(SW_HIDE);
+			GetDlgItem(IDC_EDITPort)->ShowWindow(SW_HIDE);
+			GetDlgItem(setPortBtn)->ShowWindow(SW_HIDE);
+			GetDlgItem(IDC_CHECK1)->ShowWindow(SW_HIDE);
+			GetDlgItem(IDC_CHECK2)->ShowWindow(SW_HIDE);
+			GetDlgItem(IDC_CHECK3)->ShowWindow(SW_HIDE);
+			GetDlgItem(IDC_CHECK4)->ShowWindow(SW_HIDE);
+			GetDlgItem(IDC_CHECK5)->ShowWindow(SW_HIDE);
+			GetDlgItem(IDC_CHECK6)->ShowWindow(SW_HIDE);
+			GetDlgItem(IDC_CHECK7)->ShowWindow(SW_HIDE);
+			GetDlgItem(IDC_COMBO2)->ShowWindow(SW_HIDE);
+			GetDlgItem(IDC_BUTTON_Cal)->ShowWindow(SW_HIDE);
+			GetDlgItem(IDC_BUTTON_SET)->ShowWindow(SW_HIDE);
+			GetDlgItem(IDC_BUTTON1)->ShowWindow(SW_HIDE);
+
+			CString order1 = _T(">USER\r\n");
+			m_SerialPort.WriteToPort(order1.GetBuffer(order1.GetLength()));
+		}
+	}
+}
+
 
 void CToolDlg::OnBnClickedButton3()
 {
 	// TODO: 在此添加控件通知处理程序代码
-	ShellExecute(NULL, _T("open"), _T(".\\USER升级程序\\FileRead.exe"), NULL, NULL, SW_SHOWNORMAL);// 下划线的地方可以是网址或者是文件夹的位置，亦或者是文件的路径。
-
+	CString tmstr;
+	GetDlgItem(IDC_BTN_OPEN_CLOSE_PORT)->GetWindowText(tmstr);
+	if ( _T("关闭串口") == tmstr )
+	{
+		AfxMessageBox(_T("请关闭串口!"));
+	}
+	else
+		ShellExecute(NULL, _T("open"), _T(".\\USER升级程序\\FileRead.exe"), NULL, NULL, SW_SHOWNORMAL);// 下划线的地方可以是网址或者是文件夹的位置，亦或者是文件的路径。
 }
+
+
